@@ -1,0 +1,40 @@
+{
+  "name": "sparkle-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@ant-design/icons": "^5.1.4",
+    "@headlessui/react": "^2.2.8",
+    "@heroicons/react": "^2.2.0",
+    "@hookform/resolvers": "^5.2.2",
+    "antd": "^5.13.1",
+    "axios": "^1.6.7",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.63.0",
+    "react-router-dom": "^6.22.3",
+    "react-scripts": "^5.0.1",
+    "tailwindcss": "^4.1.13",
+    "zod": "^4.1.9"
+  },
+  "scripts": {
+    "start": "craco start",
+    "build": "craco build"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@craco/craco": "^7.1.0",
+    "autoprefixer": "^10.4.21"
+  }
+}
