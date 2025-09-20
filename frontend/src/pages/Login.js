@@ -1,4 +1,19 @@
 import React, { useState } from 'react';
+import {
+  Paper,
+  Container,
+  Title,
+  Text,
+  TextInput,
+  PasswordInput,
+  Button,
+  Stack,
+  Center,
+  Alert,
+  LoadingOverlay,
+  Box
+} from '@mantine/core';
+import { IconEye, IconEyeOff, IconAlertCircle } from '@tabler/icons-react';
 import { useAuth } from '../services/AuthContext';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -43,177 +58,109 @@ export default function Login() {
     }
   };
 
-  const containerStyle = {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    padding: '20px'
-  };
-
-  const cardStyle = {
-    background: 'white',
-    borderRadius: '12px',
-    boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-    padding: '40px',
-    width: '100%',
-    maxWidth: '400px'
-  };
-
-  const titleStyle = {
-    fontSize: '28px',
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: '8px'
-  };
-
-  const subtitleStyle = {
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: '30px',
-    fontSize: '14px'
-  };
-
-  const formStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px'
-  };
-
-  const labelStyle = {
-    display: 'block',
-    fontSize: '14px',
-    fontWeight: '500',
-    color: '#333',
-    marginBottom: '8px'
-  };
-
-  const inputStyle = {
-    width: '100%',
-    padding: '12px 16px',
-    border: '2px solid #e2e8f0',
-    borderRadius: '8px',
-    fontSize: '16px',
-    outline: 'none',
-    transition: 'border-color 0.2s',
-    boxSizing: 'border-box'
-  };
-
-  const inputFocusStyle = {
-    borderColor: '#667eea'
-  };
-
-  const passwordContainerStyle = {
-    position: 'relative'
-  };
-
-  const eyeButtonStyle = {
-    position: 'absolute',
-    right: '12px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    color: '#999',
-    fontSize: '14px'
-  };
-
-  const submitButtonStyle = {
-    width: '100%',
-    padding: '14px',
-    background: loading ? '#999' : '#667eea',
-    color: 'white',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '16px',
-    fontWeight: '600',
-    cursor: loading ? 'not-allowed' : 'pointer',
-    transition: 'background-color 0.2s',
-    marginTop: '10px'
-  };
-
-  const errorStyle = {
-    background: '#fee2e2',
-    border: '1px solid #fecaca',
-    color: '#dc2626',
-    padding: '12px',
-    borderRadius: '8px',
-    fontSize: '14px',
-    marginBottom: '20px'
-  };
-
   return (
-    <div style={containerStyle}>
-      <div style={cardStyle}>
-        <h2 style={titleStyle}>Welcome back</h2>
-        <p style={subtitleStyle}>Sign in to your SparkleWP account</p>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 20
+      }}
+    >
+      <Container size={460} my={40}>
+        <Paper
+          withBorder
+          shadow="xl"
+          p={40}
+          mt={30}
+          radius="xl"
+          style={{ position: 'relative' }}
+        >
+          <LoadingOverlay visible={loading} overlayBlur={2} />
 
-        <form style={formStyle} onSubmit={handleSubmit}>
-          {error && (
-            <div style={errorStyle}>
-              {error}
-            </div>
-          )}
+          <Center mb="xl">
+            <Stack align="center" spacing="md">
+              <Title order={2} size="h1" weight={700} color="dark">
+                Welcome back
+              </Title>
+              <Text color="dimmed" size="lg">
+                Sign in to your SparkleWP account
+              </Text>
+            </Stack>
+          </Center>
 
-          <div>
-            <label style={labelStyle} htmlFor="username">
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              style={inputStyle}
-              onFocus={(e) => e.target.style.borderColor = inputFocusStyle.borderColor}
-              onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
-              placeholder="Enter your username"
-            />
-          </div>
+          <form onSubmit={handleSubmit}>
+            <Stack spacing="lg">
+              {error && (
+                <Alert
+                  icon={<IconAlertCircle size={16} />}
+                  color="red"
+                  variant="light"
+                  radius="xl"
+                  styles={{
+                    root: {
+                      padding: '16px 20px'
+                    }
+                  }}
+                >
+                  {error}
+                </Alert>
+              )}
 
-          <div>
-            <label style={labelStyle} htmlFor="password">
-              Password
-            </label>
-            <div style={passwordContainerStyle}>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
+              <TextInput
+                label="Username"
+                placeholder="Enter your username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                size="lg"
+                radius="md"
+                style={{ fontWeight: 500 }}
+              />
+
+              <PasswordInput
+                label="Password"
+                placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                style={inputStyle}
-                onFocus={(e) => e.target.style.borderColor = inputFocusStyle.borderColor}
-                onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
-                placeholder="Enter your password"
+                required
+                size="lg"
+                radius="md"
+                visibilityToggleIcon={({ reveal, size }) =>
+                  reveal ? <IconEyeOff size={size} /> : <IconEye size={size} />
+                }
               />
-              <button
-                type="button"
-                style={eyeButtonStyle}
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? '🙈' : '👁️'}
-              </button>
-            </div>
-          </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={submitButtonStyle}
-            onMouseEnter={(e) => {
-              if (!loading) e.target.style.background = '#5a67d8';
-            }}
-            onMouseLeave={(e) => {
-              if (!loading) e.target.style.background = '#667eea';
-            }}
-          >
-            {loading ? 'Signing in...' : 'Sign in'}
-          </button>
-        </form>
-      </div>
-    </div>
+              <Button
+                type="submit"
+                loading={loading}
+                size="lg"
+                mt="xl"
+                radius="xl"
+                px="xl"
+                style={{
+                  background: 'linear-gradient(45deg, #667eea, #764ba2)',
+                  border: 0,
+                  boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                }}
+                styles={{
+                  root: {
+                    '&:hover': {
+                      background: 'linear-gradient(45deg, #5a67d8, #6b46c1)',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 6px 16px rgba(102, 126, 234, 0.4)',
+                    }
+                  }
+                }}
+              >
+                {loading ? 'Signing in...' : 'Sign in'}
+              </Button>
+            </Stack>
+          </form>
+        </Paper>
+      </Container>
+    </Box>
   );
 } 

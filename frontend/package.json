@@ -4,24 +4,31 @@
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^5.1.4",
+    "@emotion/react": "^11.14.0",
     "@headlessui/react": "^2.2.8",
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.2.2",
+    "@mantine/core": "^8.3.1",
+    "@mantine/dates": "^8.3.1",
+    "@mantine/form": "^8.3.1",
+    "@mantine/hooks": "^8.3.1",
+    "@mantine/notifications": "^8.3.1",
+    "@tabler/icons-react": "^3.35.0",
     "antd": "^5.13.1",
     "axios": "^1.6.7",
     "postcss-flexbugs-fixes": "^5.0.2",
+    "postcss-normalize": "^13.0.1",
     "postcss-preset-env": "^10.3.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.63.0",
     "react-router-dom": "^6.22.3",
     "react-scripts": "^5.0.1",
-    "tailwindcss": "^4.1.13",
     "zod": "^4.1.9"
   },
   "scripts": {
-    "start": "craco start",
-    "build": "craco build"
+    "start": "react-scripts start",
+    "build": "react-scripts build"
   },
   "browserslist": {
     "production": [
@@ -34,9 +41,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@craco/craco": "^7.1.0",
-    "autoprefixer": "^10.4.21"
   }
 }

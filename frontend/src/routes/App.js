@@ -43,7 +43,10 @@ export default function App() {
   const contentStyle = {
     marginLeft: '250px', // Account for fixed sidebar width
     flex: 1,
-    minHeight: '100vh'
+    minHeight: '100vh',
+    width: 'calc(100vw - 250px)',
+    maxWidth: 'calc(100vw - 250px)',
+    overflow: 'hidden'
   };
 
   // If authenticated, show the full layout with sidebar and content

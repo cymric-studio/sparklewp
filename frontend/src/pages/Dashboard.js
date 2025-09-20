@@ -1,187 +1,221 @@
 import React from 'react';
+import {
+  Container,
+  Title,
+  Text,
+  Card,
+  Group,
+  Stack,
+  SimpleGrid,
+  Button,
+  Box,
+  ThemeIcon,
+  Flex
+} from '@mantine/core';
+import {
+  IconWorld,
+  IconUsers,
+  IconChartBar,
+  IconShield,
+  IconPlus,
+  IconRefresh,
+  IconScan,
+  IconReport
+} from '@tabler/icons-react';
 import { useAuth } from '../services/AuthContext';
 
 export default function Dashboard() {
   const { user } = useAuth();
 
-  const containerStyle = {
-    padding: '24px',
-    background: '#f5f5f5',
-    minHeight: '100vh'
-  };
+  const statsData = [
+    {
+      title: 'Total Sites',
+      value: '5',
+      icon: IconWorld,
+      color: 'blue'
+    },
+    {
+      title: 'Active Users',
+      value: '12',
+      icon: IconUsers,
+      color: 'green'
+    },
+    {
+      title: 'Updates Available',
+      value: '3',
+      icon: IconChartBar,
+      color: 'orange'
+    },
+    {
+      title: 'Security Score',
+      value: '98%',
+      icon: IconShield,
+      color: 'teal'
+    }
+  ];
 
-  const headerStyle = {
-    marginBottom: '32px'
-  };
-
-  const titleStyle = {
-    fontSize: '32px',
-    fontWeight: 'bold',
-    color: '#2d3748',
-    marginBottom: '8px'
-  };
-
-  const subtitleStyle = {
-    fontSize: '18px',
-    color: '#718096',
-    marginBottom: '24px'
-  };
-
-  const welcomeCardStyle = {
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    borderRadius: '12px',
-    padding: '32px',
-    color: 'white',
-    marginBottom: '24px',
-    boxShadow: '0 10px 25px rgba(102, 126, 234, 0.3)'
-  };
-
-  const welcomeTextStyle = {
-    fontSize: '24px',
-    fontWeight: 'bold',
-    marginBottom: '8px'
-  };
-
-  const welcomeSubtextStyle = {
-    fontSize: '16px',
-    opacity: 0.9
-  };
-
-  const statsContainerStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-    gap: '20px',
-    marginBottom: '32px'
-  };
-
-  const statCardStyle = {
-    background: 'white',
-    borderRadius: '12px',
-    padding: '24px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    border: '1px solid #e2e8f0'
-  };
-
-  const statIconStyle = {
-    fontSize: '32px',
-    marginBottom: '12px'
-  };
-
-  const statTitleStyle = {
-    fontSize: '16px',
-    color: '#718096',
-    marginBottom: '8px'
-  };
-
-  const statValueStyle = {
-    fontSize: '28px',
-    fontWeight: 'bold',
-    color: '#2d3748'
-  };
-
-  const actionsCardStyle = {
-    background: 'white',
-    borderRadius: '12px',
-    padding: '24px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    border: '1px solid #e2e8f0'
-  };
-
-  const actionsHeaderStyle = {
-    fontSize: '20px',
-    fontWeight: 'bold',
-    color: '#2d3748',
-    marginBottom: '16px'
-  };
-
-  const actionButtonStyle = {
-    display: 'inline-block',
-    padding: '12px 24px',
-    background: '#667eea',
-    color: 'white',
-    textDecoration: 'none',
-    borderRadius: '8px',
-    marginRight: '12px',
-    marginBottom: '12px',
-    transition: 'background-color 0.2s',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '14px'
-  };
+  const actions = [
+    { label: 'Add New Site', icon: IconPlus },
+    { label: 'Run Updates', icon: IconRefresh },
+    { label: 'Security Scan', icon: IconScan },
+    { label: 'View Reports', icon: IconReport }
+  ];
 
   return (
-    <div style={containerStyle}>
-      <div style={headerStyle}>
-        <h1 style={titleStyle}>Dashboard</h1>
-        <p style={subtitleStyle}>Overview of your SparkleWP management system</p>
-      </div>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundColor: '#f8f9fa',
+        padding: '32px'
+      }}
+    >
+      <Container size="xl">
+        <Stack spacing="xl">
+          <Box mb="lg" mt="xl" pt="md">
+            <Title order={1} size="h1" weight={700} mb="md">
+              Dashboard
+            </Title>
+            <Text color="dimmed" size="lg">
+              Overview of your SparkleWP management system
+            </Text>
+          </Box>
 
-      <div style={welcomeCardStyle}>
-        <div style={welcomeTextStyle}>
-          Welcome back, {user?.username || 'Admin'}! 👋
-        </div>
-        <div style={welcomeSubtextStyle}>
-          Here's what's happening with your WordPress sites today.
-        </div>
-      </div>
+          <Card
+            shadow="xl"
+            padding="2.5rem"
+            radius="lg"
+            style={{
+              background: '#2C5F7C',
+              border: 0
+            }}
+          >
+            <Stack spacing="md" style={{ padding: '0.5rem 0' }}>
+              <Text size="xl" weight={700} color="white">
+                Welcome back, {user?.username || 'Admin'}! 👋
+              </Text>
+              <Text size="md" color="white" style={{ opacity: 0.9 }}>
+                Here's what's happening with your WordPress sites today.
+              </Text>
+            </Stack>
+          </Card>
 
-      <div style={statsContainerStyle}>
-        <div style={statCardStyle}>
-          <div style={statIconStyle}>🌐</div>
-          <div style={statTitleStyle}>Total Sites</div>
-          <div style={statValueStyle}>5</div>
-        </div>
+          <SimpleGrid
+            cols={4}
+            spacing="xl"
+            breakpoints={[
+              { maxWidth: 'md', cols: 2 },
+              { maxWidth: 'sm', cols: 1 }
+            ]}
+          >
+            {statsData.map((stat, index) => (
+              <Card
+                key={index}
+                shadow="lg"
+                padding="2rem"
+                radius="xl"
+                withBorder={false}
+                styles={{
+                  root: {
+                    backgroundColor: 'white',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+                    }
+                  }
+                }}
+              >
+                <Stack spacing="lg" align="stretch">
+                  <Group position="apart" align="flex-start">
+                    <ThemeIcon
+                      size={64}
+                      radius="xl"
+                      variant="filled"
+                      color={stat.color === 'blue' ? '#3B82C7' :
+                             stat.color === 'green' ? '#059669' :
+                             stat.color === 'orange' ? '#D97706' : '#0891B2'}
+                      styles={{
+                        root: {
+                          boxShadow: `0 4px 12px ${
+                            stat.color === 'blue' ? 'rgba(59, 130, 199, 0.3)' :
+                            stat.color === 'green' ? 'rgba(5, 150, 105, 0.3)' :
+                            stat.color === 'orange' ? 'rgba(217, 119, 6, 0.3)' : 'rgba(8, 145, 178, 0.3)'
+                          }`
+                        }
+                      }}
+                    >
+                      <stat.icon size={28} stroke={1.5} />
+                    </ThemeIcon>
+                  </Group>
 
-        <div style={statCardStyle}>
-          <div style={statIconStyle}>👥</div>
-          <div style={statTitleStyle}>Active Users</div>
-          <div style={statValueStyle}>12</div>
-        </div>
+                  <Box>
+                    <Text
+                      color="dimmed"
+                      size="sm"
+                      mb="xs"
+                      weight={600}
+                      transform="uppercase"
+                      style={{ letterSpacing: '0.5px' }}
+                    >
+                      {stat.title}
+                    </Text>
+                    <Text
+                      size={32}
+                      weight={800}
+                      style={{
+                        color: stat.color === 'blue' ? '#3B82C7' :
+                               stat.color === 'green' ? '#059669' :
+                               stat.color === 'orange' ? '#D97706' : '#0891B2',
+                        lineHeight: 1.2
+                      }}
+                    >
+                      {stat.value}
+                    </Text>
+                  </Box>
+                </Stack>
+              </Card>
+            ))}
+          </SimpleGrid>
 
-        <div style={statCardStyle}>
-          <div style={statIconStyle}>📊</div>
-          <div style={statTitleStyle}>Updates Available</div>
-          <div style={statValueStyle}>3</div>
-        </div>
-
-        <div style={statCardStyle}>
-          <div style={statIconStyle}>🔒</div>
-          <div style={statTitleStyle}>Security Score</div>
-          <div style={statValueStyle}>98%</div>
-        </div>
-      </div>
-
-      <div style={actionsCardStyle}>
-        <div style={actionsHeaderStyle}>Quick Actions</div>
-        <button
-          style={actionButtonStyle}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#5a67d8'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = '#667eea'}
-        >
-          Add New Site
-        </button>
-        <button
-          style={actionButtonStyle}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#5a67d8'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = '#667eea'}
-        >
-          Run Updates
-        </button>
-        <button
-          style={actionButtonStyle}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#5a67d8'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = '#667eea'}
-        >
-          Security Scan
-        </button>
-        <button
-          style={actionButtonStyle}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#5a67d8'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = '#667eea'}
-        >
-          View Reports
-        </button>
-      </div>
-    </div>
+          <Card shadow="md" padding="xl" radius="xl" withBorder={false} style={{ marginTop: '2rem', marginBottom: '2rem' }}>
+            <div style={{ marginTop: '2rem', paddingTop: '1.5rem' }}>
+              <Title order={3} size="h3" weight={600} mb="xl">
+                Quick Actions
+              </Title>
+            </div>
+            <SimpleGrid cols={4} spacing="md" breakpoints={[
+              { maxWidth: 'md', cols: 2 },
+              { maxWidth: 'sm', cols: 1 }
+            ]}>
+              {actions.map((action, index) => (
+                <Button
+                  key={index}
+                  leftIcon={<action.icon size={20} />}
+                  variant="filled"
+                  color="#2C5F7C"
+                  radius="xl"
+                  size="lg"
+                  px="xl"
+                  fullWidth
+                  styles={{
+                    root: {
+                      boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 6px 16px rgba(102, 126, 234, 0.4)',
+                      }
+                    }
+                  }}
+                >
+                  {action.label}
+                </Button>
+              ))}
+            </SimpleGrid>
+          </Card>
+        </Stack>
+      </Container>
+    </Box>
   );
 } 

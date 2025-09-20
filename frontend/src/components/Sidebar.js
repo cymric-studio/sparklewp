@@ -1,148 +1,175 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import {
+  Title,
+  Text,
+  Group,
+  Stack,
+  Button,
+  ActionIcon,
+  UnstyledButton,
+  Box,
+  Divider
+} from '@mantine/core';
+import {
+  IconDashboard,
+  IconUsers,
+  IconLogout,
+  IconSun,
+  IconMoonStars
+} from '@tabler/icons-react';
 import { useAuth } from '../services/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout, user } = useAuth();
+  const { colorScheme, toggleColorScheme } = useTheme();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const sidebarStyle = {
-    width: '250px',
-    minHeight: '100vh',
-    background: 'linear-gradient(180deg, #2d3748 0%, #1a202c 100%)',
-    color: 'white',
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'fixed',
-    left: 0,
-    top: 0,
-    zIndex: 1000,
-    boxShadow: '2px 0 8px rgba(0,0,0,0.1)'
-  };
-
-  const logoStyle = {
-    padding: '24px 20px',
-    fontSize: '24px',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    borderBottom: '1px solid rgba(255,255,255,0.1)',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    backgroundClip: 'text',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    color: 'white'
-  };
-
-  const navStyle = {
-    flex: 1,
-    padding: '20px 0'
-  };
-
-  const navItemStyle = {
-    display: 'block',
-    padding: '12px 20px',
-    color: 'rgba(255,255,255,0.8)',
-    textDecoration: 'none',
-    transition: 'all 0.2s',
-    borderLeft: '3px solid transparent',
-    fontSize: '16px'
-  };
-
-  const activeNavItemStyle = {
-    ...navItemStyle,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    color: 'white',
-    borderLeftColor: '#667eea'
-  };
-
-  const bottomSectionStyle = {
-    borderTop: '1px solid rgba(255,255,255,0.1)',
-    padding: '20px'
-  };
-
-  const welcomeStyle = {
-    fontSize: '14px',
-    color: 'rgba(255,255,255,0.7)',
-    marginBottom: '12px'
-  };
-
-  const logoutButtonStyle = {
-    width: '100%',
-    padding: '10px 16px',
-    background: 'rgba(255,255,255,0.1)',
-    border: 'none',
-    borderRadius: '6px',
-    color: 'white',
-    cursor: 'pointer',
-    fontSize: '14px',
-    transition: 'background-color 0.2s',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px'
-  };
+  const navItems = [
+    { path: '/', label: 'Dashboard', icon: IconDashboard },
+    { path: '/users', label: 'Users', icon: IconUsers }
+  ];
 
   return (
-    <div style={sidebarStyle}>
-      <div style={logoStyle}>
-        SparkleWP
-      </div>
-
-      <nav style={navStyle}>
-        <Link
-          to="/"
-          style={location.pathname === '/' ? activeNavItemStyle : navItemStyle}
-          onMouseEnter={(e) => {
-            if (location.pathname !== '/') {
-              e.target.style.backgroundColor = 'rgba(255,255,255,0.05)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (location.pathname !== '/') {
-              e.target.style.backgroundColor = 'transparent';
-            }
+    <Box
+      style={{
+        width: 250,
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        height: '100vh',
+        background: colorScheme === 'dark'
+          ? 'linear-gradient(180deg, #2c2e33 0%, #1a1b1e 100%)'
+          : 'linear-gradient(180deg, #2d3748 0%, #1a202c 100%)',
+        borderRight: 'none',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: 16,
+        zIndex: 1000,
+        boxSizing: 'border-box',
+        overflow: 'hidden'
+      }}
+    >
+      <Box
+        p="md"
+        mb="md"
+        style={{
+          textAlign: 'center',
+          borderBottom: '1px solid rgba(255,255,255,0.1)'
+        }}
+      >
+        <Title
+          order={2}
+          size="h3"
+          style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            color: 'white'
           }}
         >
-          📊 Dashboard
-        </Link>
+          SparkleWP
+        </Title>
+      </Box>
 
-        <Link
-          to="/users"
-          style={location.pathname === '/users' ? activeNavItemStyle : navItemStyle}
-          onMouseEnter={(e) => {
-            if (location.pathname !== '/users') {
-              e.target.style.backgroundColor = 'rgba(255,255,255,0.05)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (location.pathname !== '/users') {
-              e.target.style.backgroundColor = 'transparent';
-            }
-          }}
-        >
-          👥 Users
-        </Link>
-      </nav>
+      <Box style={{ flex: 1, overflow: 'hidden' }}>
+        <Stack spacing="xs">
+          {navItems.map((item) => (
+            <UnstyledButton
+              key={item.path}
+              component={Link}
+              to={item.path}
+              style={{
+                display: 'block',
+                width: '100%',
+                maxWidth: '218px',
+                padding: '12px 16px',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                color: location.pathname === item.path ? 'white' : 'rgba(255,255,255,0.8)',
+                backgroundColor: location.pathname === item.path
+                  ? 'rgba(102, 126, 234, 0.8)'
+                  : 'transparent',
+                transition: 'all 0.2s',
+                borderLeft: location.pathname === item.path
+                  ? '3px solid #667eea'
+                  : '3px solid transparent',
+                overflow: 'hidden'
+              }}
+              styles={{
+                root: {
+                  '&:hover': {
+                    backgroundColor: location.pathname === item.path
+                      ? 'rgba(102, 126, 234, 0.9)'
+                      : 'rgba(255,255,255,0.1)'
+                  }
+                }
+              }}
+            >
+              <Group spacing="sm" style={{ maxWidth: '100%', overflow: 'hidden' }}>
+                <item.icon size={18} style={{ flexShrink: 0 }} />
+                <Text size="sm" weight={500} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {item.label}
+                </Text>
+              </Group>
+            </UnstyledButton>
+          ))}
+        </Stack>
+      </Box>
 
-      <div style={bottomSectionStyle}>
-        <div style={welcomeStyle}>
+      <Box>
+        <Divider mb="md" color="rgba(255,255,255,0.1)" />
+
+        <Group position="apart" mb="md">
+          <Text size="sm" color="rgba(255,255,255,0.7)">
+            Theme
+          </Text>
+          <ActionIcon
+            onClick={toggleColorScheme}
+            size="lg"
+            variant="light"
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              color: 'white'
+            }}
+          >
+            {colorScheme === 'dark' ? <IconSun size={18} /> : <IconMoonStars size={18} />}
+          </ActionIcon>
+        </Group>
+
+        <Text size="sm" color="rgba(255,255,255,0.7)" mb="md">
           Welcome back, {user?.username || 'Admin'}!
-        </div>
-        <button
-          style={logoutButtonStyle}
+        </Text>
+
+        <Button
+          leftIcon={<IconLogout size={16} />}
+          variant="light"
+          fullWidth
           onClick={handleLogout}
-          onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255,255,255,0.2)'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+          style={{
+            backgroundColor: 'rgba(255,255,255,0.1)',
+            color: 'white',
+            border: 'none'
+          }}
+          styles={{
+            root: {
+              '&:hover': {
+                backgroundColor: 'rgba(255,255,255,0.2)'
+              }
+            }
+          }}
         >
-          🚪 Logout
-        </button>
-      </div>
-    </div>
+          Logout
+        </Button>
+      </Box>
+    </Box>
   );
 } 
