@@ -1,13 +1,10 @@
 import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { Layout } from 'antd';
 import Sidebar from '../components/Sidebar';
 import Dashboard from '../pages/Dashboard';
 import Users from '../pages/Users';
 import Login from '../pages/Login';
 import { useAuth } from '../services/AuthContext';
-
-const { Content } = Layout;
 
 // PrivateRoute component: Only renders children if user is authenticated
 function PrivateRoute({ children }) {
@@ -37,22 +34,34 @@ export default function App() {
     );
   }
 
+  const layoutStyle = {
+    display: 'flex',
+    minHeight: '100vh',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+  };
+
+  const contentStyle = {
+    marginLeft: '250px', // Account for fixed sidebar width
+    flex: 1,
+    minHeight: '100vh'
+  };
+
   // If authenticated, show the full layout with sidebar and content
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      {/* Sidebar navigation for authenticated users */}
+    <div style={layoutStyle}>
+      {/* Fixed Sidebar navigation for authenticated users */}
       <Sidebar />
-      <Layout>
-        <Content style={{ margin: '24px 16px 0' }}>
-          {/* Define protected routes */}
-          <Routes>
-            <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-            <Route path="/users" element={<PrivateRoute><Users /></PrivateRoute>} />
-            {/* Redirect any unknown route to dashboard */}
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </Content>
-      </Layout>
-    </Layout>
+
+      {/* Main content area */}
+      <div style={contentStyle}>
+        {/* Define protected routes */}
+        <Routes>
+          <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/users" element={<PrivateRoute><Users /></PrivateRoute>} />
+          {/* Redirect any unknown route to dashboard */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </div>
+    </div>
   );
 } 

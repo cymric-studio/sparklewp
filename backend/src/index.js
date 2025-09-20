@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
+const { MongoMemoryServer } = require('mongodb-memory-server');
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
 const seedAdmin = require('./seed/seedAdmin');
@@ -17,12 +18,22 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://mongo:27017/sparkle';
 
-mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(async () => {
-    console.log('MongoDB connected');
+async function startServer() {
+  try {
+    // Start in-memory MongoDB server
+    const mongod = await MongoMemoryServer.create();
+    const mongoUri = mongod.getUri();
+
+    console.log('Starting in-memory MongoDB...');
+    await mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+    console.log('MongoDB connected successfully');
+
     await seedAdmin();
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-  })
-  .catch(err => console.error('MongoDB connection error:', err)); 
+  } catch (err) {
+    console.error('Server startup error:', err);
+  }
+}
+
+startServer(); 
