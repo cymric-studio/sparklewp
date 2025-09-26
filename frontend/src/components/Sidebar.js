@@ -14,6 +14,7 @@ import {
 import {
   IconDashboard,
   IconUsers,
+  IconWorld,
   IconLogout,
   IconSun,
   IconMoonStars
@@ -34,6 +35,7 @@ export default function Sidebar() {
 
   const navItems = [
     { path: '/', label: 'Dashboard', icon: IconDashboard },
+    { path: '/websites', label: 'Websites', icon: IconWorld },
     { path: '/users', label: 'Users', icon: IconUsers }
   ];
 

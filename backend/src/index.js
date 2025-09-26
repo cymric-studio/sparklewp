@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
+const websiteRoutes = require('./routes/websiteRoutes');
 const seedAdmin = require('./seed/seedAdmin');
 
 const app = express();
@@ -16,6 +17,7 @@ app.use(helmet());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/websites', websiteRoutes);
 
 const PORT = process.env.PORT || 5000;
 

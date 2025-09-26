@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Dashboard from '../pages/Dashboard';
+import Websites from '../pages/Websites';
 import Users from '../pages/Users';
 import Login from '../pages/Login';
 import { useAuth } from '../services/AuthContext';
@@ -60,6 +61,7 @@ export default function App() {
         {/* Define protected routes */}
         <Routes>
           <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/websites" element={<PrivateRoute><Websites /></PrivateRoute>} />
           <Route path="/users" element={<PrivateRoute><Users /></PrivateRoute>} />
           {/* Redirect any unknown route to dashboard */}
           <Route path="*" element={<Navigate to="/" />} />
