@@ -4,6 +4,7 @@ import Sidebar from '../components/Sidebar';
 import Dashboard from '../pages/Dashboard';
 import Websites from '../pages/Websites';
 import Users from '../pages/Users';
+import Logging from '../pages/Logging';
 import Login from '../pages/Login';
 import { useAuth } from '../services/AuthContext';
 
@@ -63,6 +64,7 @@ export default function App() {
           <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/websites" element={<PrivateRoute><Websites /></PrivateRoute>} />
           <Route path="/users" element={<PrivateRoute><Users /></PrivateRoute>} />
+          <Route path="/logging" element={<PrivateRoute><Logging /></PrivateRoute>} />
           {/* Redirect any unknown route to dashboard */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

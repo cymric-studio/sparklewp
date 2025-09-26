@@ -7,6 +7,8 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
 const websiteRoutes = require('./routes/websiteRoutes');
+const logRoutes = require('./routes/logRoutes');
+const requestLogger = require('./middleware/logger');
 const seedAdmin = require('./seed/seedAdmin');
 
 const app = express();
@@ -15,9 +17,13 @@ app.use(express.json());
 app.use(cors({ origin: process.env.CLIENT_URL || '*' }));
 app.use(helmet());
 
+// Add request logging middleware
+app.use(requestLogger.middleware());
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/websites', websiteRoutes);
+app.use('/api/logs', logRoutes);
 
 const PORT = process.env.PORT || 5000;
 
