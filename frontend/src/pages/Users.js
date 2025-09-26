@@ -186,10 +186,10 @@ export default function Users() {
       sx={{
         minHeight: '100vh',
         backgroundColor: '#f8f9fa',
-        padding: '32px'
+        padding: '40px 48px'
       }}
     >
-      <Container size="xl">
+      <Container size="xl" px="xl">
         <Stack spacing="xl">
           {(error || success) && (
             <Alert
@@ -199,7 +199,8 @@ export default function Users() {
               radius="xl"
               styles={{
                 root: {
-                  padding: '16px 20px'
+                  padding: '20px 24px',
+                  marginBottom: '16px'
                 }
               }}
             >
@@ -207,38 +208,43 @@ export default function Users() {
             </Alert>
           )}
 
-          <Group position="apart" mb="lg" mt="xl" pt="md">
+          <Flex justify="space-between" align="flex-end" mb="xl" mt="xl" pt="xl">
             <Box>
-              <Title order={1} size="h1" weight={700} mb="xs">
+              <Title order={1} size="h1" weight={700} mb="xs" sx={{ fontSize: '2.5rem' }}>
                 Users
               </Title>
-              <Text color="dimmed" size="lg">
+              <Text color="dimmed" size="lg" sx={{ fontSize: '1.125rem' }}>
                 Manage user accounts and permissions
               </Text>
             </Box>
             <Button
               leftIcon={<IconPlus size={20} />}
               variant="gradient"
-              gradient={{ from: 'brand.5', to: 'brand.7' }}
+              gradient={{ from: 'blue.6', to: 'blue.8' }}
               onClick={() => setModalOpen(true)}
               radius="xl"
               size="lg"
               px="xl"
               styles={{
                 root: {
-                  boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                  padding: '14px 32px',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  boxShadow: '0 6px 20px rgba(37, 99, 235, 0.25)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  minWidth: '160px',
                   '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 6px 16px rgba(102, 126, 234, 0.4)',
+                    transform: 'translateY(-3px)',
+                    boxShadow: '0 8px 25px rgba(37, 99, 235, 0.35)',
                   }
                 }
               }}
             >
               Add User
             </Button>
-          </Group>
+          </Flex>
 
-          <Box sx={{ position: 'relative' }}>
+          <Box sx={{ position: 'relative', padding: '0 8px' }}>
             <LoadingOverlay visible={loading} overlayBlur={2} />
             <Table
               striped
@@ -246,18 +252,29 @@ export default function Users() {
               withBorder
               withColumnBorders
               sx={{
-                borderRadius: '16px',
+                borderRadius: '20px',
                 overflow: 'hidden',
+                backgroundColor: '#ffffff',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+                border: '1px solid rgba(0, 0, 0, 0.05)',
                 '& th': {
-                  backgroundColor: '#f8f9fa',
-                  padding: '16px 20px',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: '#495057'
+                  backgroundColor: '#f8fafc',
+                  padding: '20px 28px',
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  color: '#374151',
+                  borderBottom: '2px solid #e5e7eb',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  textAlign: 'left'
                 },
                 '& td': {
-                  padding: '16px 20px',
-                  borderBottom: '1px solid #e9ecef'
+                  padding: '20px 28px',
+                  borderBottom: '1px solid #f3f4f6',
+                  fontSize: '15px'
+                },
+                '& tbody tr:hover': {
+                  backgroundColor: '#f8fafc'
                 }
               }}
             >
@@ -273,42 +290,71 @@ export default function Users() {
                 {users.map((userItem) => (
                   <tr key={userItem._id}>
                     <td>
-                      <Text weight={600} size="sm">{userItem.username}</Text>
+                      <Text weight={700} size="md" sx={{ fontSize: '16px', color: '#1f2937' }}>
+                        {userItem.username}
+                      </Text>
                     </td>
                     <td>
-                      <Text color="dimmed" size="sm">{userItem.email}</Text>
+                      <Text color="dimmed" size="md" sx={{ fontSize: '15px', color: '#6b7280' }}>
+                        {userItem.email}
+                      </Text>
                     </td>
                     <td>
                       <Badge
-                        color={userItem.role === 'administrator' ? 'red' : 'green'}
-                        variant="light"
+                        color={userItem.role === 'administrator' ? 'red' : 'blue'}
+                        variant="filled"
                         radius="xl"
-                        size="md"
+                        size="lg"
+                        styles={{
+                          root: {
+                            padding: '8px 16px',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.5px'
+                          }
+                        }}
                       >
-                        {userItem.role === 'administrator' ? 'Admin' : 'Staff'}
+                        {userItem.role === 'administrator' ? 'ADMIN' : 'STAFF'}
                       </Badge>
                     </td>
                     <td>
-                      <Group spacing="sm">
+                      <Group spacing="md">
                         <ActionIcon
                           color="blue"
-                          size="md"
-                          variant="light"
+                          size="lg"
+                          variant="subtle"
                           radius="xl"
                           onClick={() => openEditModal(userItem)}
                           disabled={!isAdmin && userItem.role === 'administrator'}
+                          styles={{
+                            root: {
+                              '&:hover': {
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                transform: 'scale(1.1)'
+                              }
+                            }
+                          }}
                         >
-                          <IconEdit size={16} />
+                          <IconEdit size={18} />
                         </ActionIcon>
                         <ActionIcon
                           color="red"
-                          size="md"
-                          variant="light"
+                          size="lg"
+                          variant="subtle"
                           radius="xl"
                           onClick={() => openDeleteModal(userItem)}
                           disabled={!isAdmin}
+                          styles={{
+                            root: {
+                              '&:hover': {
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                transform: 'scale(1.1)'
+                              }
+                            }
+                          }}
                         >
-                          <IconTrash size={16} />
+                          <IconTrash size={18} />
                         </ActionIcon>
                       </Group>
                     </td>
