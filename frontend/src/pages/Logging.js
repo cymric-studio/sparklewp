@@ -29,7 +29,8 @@ import {
   IconRefresh,
   IconEye,
   IconFilter,
-  IconSettings
+  IconSettings,
+  IconCode
 } from '@tabler/icons-react';
 import { useAuth } from '../services/AuthContext';
 import api from '../services/api';
@@ -53,7 +54,9 @@ export default function Logging() {
     return localStorage.getItem('sparklewp-logging-filter-status') || 'all';
   });
   const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [requestBodyModalOpen, setRequestBodyModalOpen] = useState(false);
   const [selectedLog, setSelectedLog] = useState(null);
+  const [selectedRequestBody, setSelectedRequestBody] = useState(null);
   const refreshInterval = useRef(null);
 
   const fetchLogs = async () => {
@@ -163,6 +166,11 @@ export default function Logging() {
   const openLogDetail = (log) => {
     setSelectedLog(log);
     setDetailModalOpen(true);
+  };
+
+  const openRequestBody = (log) => {
+    setSelectedRequestBody(log);
+    setRequestBodyModalOpen(true);
   };
 
   const getStatusColor = (status) => {
@@ -391,7 +399,7 @@ export default function Logging() {
                   <th>Status</th>
                   <th>Response Time</th>
                   <th>User</th>
-                  <th width={100}>Actions</th>
+                  <th width={120}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -448,23 +456,44 @@ export default function Logging() {
                       </Text>
                     </td>
                     <td>
-                      <ActionIcon
-                        color="blue"
-                        size="lg"
-                        variant="subtle"
-                        radius="xl"
-                        onClick={() => openLogDetail(log)}
-                        styles={{
-                          root: {
-                            '&:hover': {
-                              backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                              transform: 'scale(1.1)'
+                      <Group spacing="xs">
+                        <ActionIcon
+                          color="green"
+                          size="lg"
+                          variant="subtle"
+                          radius="xl"
+                          onClick={() => openRequestBody(log)}
+                          title="View Request Body"
+                          styles={{
+                            root: {
+                              '&:hover': {
+                                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                                transform: 'scale(1.1)'
+                              }
                             }
-                          }
-                        }}
-                      >
-                        <IconEye size={18} />
-                      </ActionIcon>
+                          }}
+                        >
+                          <IconCode size={18} />
+                        </ActionIcon>
+                        <ActionIcon
+                          color="blue"
+                          size="lg"
+                          variant="subtle"
+                          radius="xl"
+                          onClick={() => openLogDetail(log)}
+                          title="View Full Details"
+                          styles={{
+                            root: {
+                              '&:hover': {
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                transform: 'scale(1.1)'
+                              }
+                            }
+                          }}
+                        >
+                          <IconEye size={18} />
+                        </ActionIcon>
+                      </Group>
                     </td>
                   </tr>
                 ))}
@@ -544,6 +573,90 @@ export default function Logging() {
                         {JSON.stringify(selectedLog.responseBody, null, 2)}
                       </Code>
                     </ScrollArea>
+                  </Box>
+                )}
+              </Stack>
+            )}
+          </Modal>
+
+          {/* Request Body Modal */}
+          <Modal
+            opened={requestBodyModalOpen}
+            onClose={() => setRequestBodyModalOpen(false)}
+            title={selectedRequestBody ? `Request Body - ${selectedRequestBody.method} ${selectedRequestBody.url}` : 'Request Body'}
+            size="lg"
+            radius="xl"
+            styles={{
+              content: {
+                padding: '24px'
+              },
+              header: {
+                padding: '24px 24px 0'
+              },
+              body: {
+                padding: '24px'
+              }
+            }}
+          >
+            {selectedRequestBody && (
+              <Stack spacing="md">
+                <Group spacing="xl">
+                  <Box>
+                    <Text size="sm" color="dimmed" mb={4}>Method</Text>
+                    <Badge color={getMethodColor(selectedRequestBody.method)} size="lg">
+                      {selectedRequestBody.method}
+                    </Badge>
+                  </Box>
+                  <Box>
+                    <Text size="sm" color="dimmed" mb={4}>Status</Text>
+                    <Badge color={getStatusColor(selectedRequestBody.statusCode)} size="lg">
+                      {selectedRequestBody.statusCode}
+                    </Badge>
+                  </Box>
+                  <Box>
+                    <Text size="sm" color="dimmed" mb={4}>Time</Text>
+                    <Text weight={600}>
+                      {new Date(selectedRequestBody.timestamp).toLocaleString()}
+                    </Text>
+                  </Box>
+                </Group>
+
+                <Box>
+                  <Text weight={600} mb="sm">Endpoint</Text>
+                  <Code block>
+                    {selectedRequestBody.url}
+                  </Code>
+                </Box>
+
+                {selectedRequestBody.requestQuery && Object.keys(selectedRequestBody.requestQuery).length > 0 && (
+                  <Box>
+                    <Text weight={600} mb="sm">Query Parameters</Text>
+                    <ScrollArea style={{ maxHeight: '200px' }}>
+                      <Code block>
+                        {JSON.stringify(selectedRequestBody.requestQuery, null, 2)}
+                      </Code>
+                    </ScrollArea>
+                  </Box>
+                )}
+
+                {selectedRequestBody.requestBody && (
+                  <Box>
+                    <Text weight={600} mb="sm">Request Body</Text>
+                    <ScrollArea style={{ maxHeight: '300px' }}>
+                      <Code block>
+                        {typeof selectedRequestBody.requestBody === 'string'
+                          ? selectedRequestBody.requestBody
+                          : JSON.stringify(selectedRequestBody.requestBody, null, 2)}
+                      </Code>
+                    </ScrollArea>
+                  </Box>
+                )}
+
+                {!selectedRequestBody.requestBody && (
+                  <Box>
+                    <Text size="sm" color="dimmed" style={{ fontStyle: 'italic' }}>
+                      No request body data available
+                    </Text>
                   </Box>
                 )}
               </Stack>

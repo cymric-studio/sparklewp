@@ -154,6 +154,21 @@ export default function Websites() {
     }
   };
 
+  const handleTestConnection = async (website) => {
+    setError('');
+    setSuccess('');
+
+    try {
+      const res = await api.post(`/api/websites/${website._id}/test`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSuccess(`Connection test successful for ${website.name}. Site data refreshed.`);
+      fetchWebsites(); // Refresh the list to show updated stats
+    } catch (err) {
+      setError(err.response?.data?.message || 'Connection test failed');
+    }
+  };
+
   const openConnectModal = (website) => {
     setConnectingWebsite(website);
     setConnectModalOpen(true);
@@ -391,6 +406,8 @@ export default function Websites() {
                             size="lg"
                             variant="subtle"
                             radius="xl"
+                            onClick={() => handleTestConnection(website)}
+                            title="Test Connection & Refresh Data"
                             styles={{
                               root: {
                                 '&:hover': {

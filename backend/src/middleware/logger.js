@@ -127,8 +127,13 @@ class RequestLogger {
 
   middleware() {
     return (req, res, next) => {
-      // Skip logging for static files and health checks
-      if (req.url.startsWith('/static') || req.url === '/health') {
+      // Skip logging for static files, health checks, and admin actions
+      // BUT include website API calls so we can debug WordPress connections
+      if (req.url.startsWith('/static') ||
+          req.url === '/health' ||
+          req.url.startsWith('/api/logs') ||
+          req.url.startsWith('/api/users') ||
+          req.url.startsWith('/api/auth')) {
         return next();
       }
 
