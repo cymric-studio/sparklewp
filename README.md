@@ -200,11 +200,37 @@ sparklewp/
 
 ## Contributing
 
+We welcome contributions! Please see our [Contributing Guide](.github/CONTRIBUTING.md) for detailed information on:
+
+- Development setup and workflow
+- Code style and standards
+- Pull request process
+- Areas needing contribution
+
+Quick start:
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+## Security
+
+Security is important to us. Please see our [Security Policy](SECURITY.md) for:
+- Reporting vulnerabilities
+- Security measures in place
+- Best practices for users
+- Supported versions
+
+For security issues, email: adrian@cymricstudio.com
+
+## Documentation
+
+- **[README](README.md)** - Project overview and setup
+- **[CHANGELOG](CHANGELOG.md)** - Version history and updates
+- **[Contributing](.github/CONTRIBUTING.md)** - Development and contribution guide
+- **[Security](SECURITY.md)** - Security policy and guidelines
+- **[WordPress Plugin](wordpress-plugin/README.md)** - Plugin documentation
 
 ## License
 
