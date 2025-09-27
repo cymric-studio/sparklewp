@@ -46,8 +46,14 @@ export default function Websites() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [connectModalOpen, setConnectModalOpen] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [editingWebsite, setEditingWebsite] = useState(null);
   const [deletingWebsite, setDeletingWebsite] = useState(null);
+  const [settingsWebsite, setSettingsWebsite] = useState(null);
+  const [activeSettingsTab, setActiveSettingsTab] = useState('plugins');
+  const [websitePlugins, setWebsitePlugins] = useState([]);
+  const [websiteThemes, setWebsiteThemes] = useState([]);
+  const [settingsLoading, setSettingsLoading] = useState(false);
   const [connectingWebsite, setConnectingWebsite] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -183,14 +189,62 @@ export default function Websites() {
     setSuccess('');
   };
 
+  const openSettingsModal = async (website) => {
+    console.log('openSettingsModal called with website:', website);
+    setSettingsWebsite(website);
+    setSettingsModalOpen(true);
+    setActiveSettingsTab('plugins');
+    setSettingsLoading(true);
+    setError('');
+    setSuccess('');
+
+    // Fetch detailed website information including plugins and themes
+    try {
+      console.log('Making API request to:', `/api/websites/${website._id}`);
+      const res = await api.get(`/api/websites/${website._id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      console.log('API response:', res.data);
+      const websiteData = res.data;
+
+      // If we have detailed plugin/theme data from the SparkleWP connector
+      if (websiteData.detailedPlugins) {
+        console.log('Setting plugins:', websiteData.detailedPlugins);
+        setWebsitePlugins(websiteData.detailedPlugins);
+      } else {
+        console.log('No detailedPlugins in response');
+        setWebsitePlugins([]);
+      }
+
+      if (websiteData.detailedThemes) {
+        console.log('Setting themes:', websiteData.detailedThemes);
+        setWebsiteThemes(websiteData.detailedThemes);
+      } else {
+        console.log('No detailedThemes in response');
+        setWebsiteThemes([]);
+      }
+
+    } catch (err) {
+      console.error('Error fetching website details:', err);
+      setError(err.response?.data?.message || 'Failed to fetch website details');
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
+
   const closeModal = () => {
     setModalOpen(false);
     setEditModalOpen(false);
     setDeleteModalOpen(false);
     setConnectModalOpen(false);
+    setSettingsModalOpen(false);
     setEditingWebsite(null);
     setDeletingWebsite(null);
     setConnectingWebsite(null);
+    setSettingsWebsite(null);
+    setWebsitePlugins([]);
+    setWebsiteThemes([]);
     setFormData({ name: '', url: '', description: '' });
     setConnectionData({ method: 'application_password', username: '', password: '', apiKey: '' });
     setError('');
@@ -425,12 +479,16 @@ export default function Websites() {
                           size="lg"
                           variant="subtle"
                           radius="xl"
+                          onClick={() => openSettingsModal(website)}
+                          disabled={website.status !== 'connected'}
                           styles={{
                             root: {
                               '&:hover': {
                                 backgroundColor: 'rgba(107, 114, 128, 0.1)',
                                 transform: 'scale(1.1)'
-                              }
+                              },
+                              opacity: website.status !== 'connected' ? 0.5 : 1,
+                              cursor: website.status !== 'connected' ? 'not-allowed' : 'pointer'
                             }
                           }}
                         >
@@ -665,6 +723,223 @@ export default function Websites() {
                   </Button>
                   <Button color="red" onClick={handleDeleteWebsite}>
                     Delete Website
+                  </Button>
+                </Group>
+              </Stack>
+            )}
+          </Modal>
+
+          {/* Website Settings Modal */}
+          <Modal
+            opened={settingsModalOpen}
+            onClose={closeModal}
+            title={settingsWebsite ? `Settings - ${settingsWebsite.name}` : 'Website Settings'}
+            size="xl"
+            radius="xl"
+            styles={{
+              content: {
+                padding: '24px'
+              },
+              header: {
+                padding: '24px 24px 0'
+              },
+              body: {
+                padding: '24px'
+              }
+            }}
+          >
+            {settingsWebsite && (
+              <Stack spacing="lg">
+                {/* Tab Navigation */}
+                <Group spacing="md">
+                  <Button
+                    variant={activeSettingsTab === 'plugins' ? 'filled' : 'light'}
+                    onClick={() => setActiveSettingsTab('plugins')}
+                    radius="xl"
+                    size="sm"
+                    styles={{
+                      root: {
+                        backgroundColor: activeSettingsTab === 'plugins'
+                          ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                          : 'rgba(102, 126, 234, 0.1)',
+                        color: activeSettingsTab === 'plugins' ? 'white' : '#667eea',
+                        border: 'none',
+                        '&:hover': {
+                          backgroundColor: activeSettingsTab === 'plugins'
+                            ? 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)'
+                            : 'rgba(102, 126, 234, 0.2)'
+                        }
+                      }
+                    }}
+                  >
+                    Plugins ({websitePlugins.length})
+                  </Button>
+                  <Button
+                    variant={activeSettingsTab === 'themes' ? 'filled' : 'light'}
+                    onClick={() => setActiveSettingsTab('themes')}
+                    radius="xl"
+                    size="sm"
+                    styles={{
+                      root: {
+                        backgroundColor: activeSettingsTab === 'themes'
+                          ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                          : 'rgba(102, 126, 234, 0.1)',
+                        color: activeSettingsTab === 'themes' ? 'white' : '#667eea',
+                        border: 'none',
+                        '&:hover': {
+                          backgroundColor: activeSettingsTab === 'themes'
+                            ? 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)'
+                            : 'rgba(102, 126, 234, 0.2)'
+                        }
+                      }
+                    }}
+                  >
+                    Themes ({websiteThemes.length})
+                  </Button>
+                </Group>
+
+                <LoadingOverlay visible={settingsLoading} />
+
+                {/* Plugins Tab */}
+                {activeSettingsTab === 'plugins' && (
+                  <Stack spacing="md">
+                    <Title order={4} style={{ color: '#374151' }}>
+                      Installed Plugins
+                    </Title>
+
+                    {websitePlugins.length === 0 ? (
+                      <Text color="dimmed" ta="center" py="xl">
+                        No plugins data available. Make sure the SparkleWP Connector plugin is installed and active.
+                      </Text>
+                    ) : (
+                      <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                        <Stack spacing="xs">
+                          {websitePlugins.map((plugin, index) => (
+                            <Card key={index} padding="md" radius="md" withBorder>
+                              <Group position="apart" align="flex-start">
+                                <Stack spacing="xs" style={{ flex: 1 }}>
+                                  <Group spacing="sm">
+                                    <Text weight={600} size="sm" style={{ color: '#1f2937' }}>
+                                      {plugin.name}
+                                    </Text>
+                                    <Badge
+                                      color={plugin.active ? 'green' : 'gray'}
+                                      variant="light"
+                                      size="sm"
+                                    >
+                                      {plugin.active ? 'Active' : 'Inactive'}
+                                    </Badge>
+                                    {plugin.network_active && (
+                                      <Badge color="blue" variant="light" size="sm">
+                                        Network Active
+                                      </Badge>
+                                    )}
+                                    {plugin.update_available && (
+                                      <Badge color="orange" variant="light" size="sm">
+                                        Update Available
+                                      </Badge>
+                                    )}
+                                  </Group>
+                                  <Text size="xs" color="dimmed" lineClamp={2}>
+                                    {plugin.description || 'No description available.'}
+                                  </Text>
+                                  <Group spacing="xs">
+                                    <Text size="xs" color="dimmed">
+                                      Version: <strong>{plugin.version}</strong>
+                                      {plugin.update_available && plugin.latest_version && (
+                                        <span style={{ color: '#f59e0b' }}>
+                                          {' → '}<strong>{plugin.latest_version}</strong>
+                                        </span>
+                                      )}
+                                    </Text>
+                                    {plugin.author && (
+                                      <Text size="xs" color="dimmed">
+                                        • Author: {plugin.author}
+                                      </Text>
+                                    )}
+                                  </Group>
+                                </Stack>
+                              </Group>
+                            </Card>
+                          ))}
+                        </Stack>
+                      </div>
+                    )}
+                  </Stack>
+                )}
+
+                {/* Themes Tab */}
+                {activeSettingsTab === 'themes' && (
+                  <Stack spacing="md">
+                    <Title order={4} style={{ color: '#374151' }}>
+                      Installed Themes
+                    </Title>
+
+                    {websiteThemes.length === 0 ? (
+                      <Text color="dimmed" ta="center" py="xl">
+                        No themes data available. Make sure the SparkleWP Connector plugin is installed and active.
+                      </Text>
+                    ) : (
+                      <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                        <Stack spacing="xs">
+                          {websiteThemes.map((theme, index) => (
+                            <Card key={index} padding="md" radius="md" withBorder>
+                              <Group position="apart" align="flex-start">
+                                <Stack spacing="xs" style={{ flex: 1 }}>
+                                  <Group spacing="sm">
+                                    <Text weight={600} size="sm" style={{ color: '#1f2937' }}>
+                                      {theme.name}
+                                    </Text>
+                                    <Badge
+                                      color={theme.active ? 'green' : 'gray'}
+                                      variant="light"
+                                      size="sm"
+                                    >
+                                      {theme.active ? 'Active' : 'Inactive'}
+                                    </Badge>
+                                    {theme.update_available && (
+                                      <Badge color="orange" variant="light" size="sm">
+                                        Update Available
+                                      </Badge>
+                                    )}
+                                  </Group>
+                                  <Text size="xs" color="dimmed" lineClamp={2}>
+                                    {theme.description || 'No description available.'}
+                                  </Text>
+                                  <Group spacing="xs">
+                                    <Text size="xs" color="dimmed">
+                                      Version: <strong>{theme.version}</strong>
+                                      {theme.update_available && theme.latest_version && (
+                                        <span style={{ color: '#f59e0b' }}>
+                                          {' → '}<strong>{theme.latest_version}</strong>
+                                        </span>
+                                      )}
+                                    </Text>
+                                    {theme.author && (
+                                      <Text size="xs" color="dimmed">
+                                        • Author: {theme.author}
+                                      </Text>
+                                    )}
+                                  </Group>
+                                </Stack>
+                              </Group>
+                            </Card>
+                          ))}
+                        </Stack>
+                      </div>
+                    )}
+                  </Stack>
+                )}
+
+                <Group position="right" mt="xl">
+                  <Button
+                    variant="light"
+                    onClick={closeModal}
+                    radius="xl"
+                    size="md"
+                    px="xl"
+                  >
+                    Close
                   </Button>
                 </Group>
               </Stack>

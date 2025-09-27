@@ -14,14 +14,89 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-// Get single website
+// Get single website with detailed plugin/theme data
 router.get('/:id', auth, async (req, res) => {
   try {
-    const website = await Website.findById(req.params.id).select('-connectionData.encryptedPassword');
+    console.log(`GET /:id called for website ID: ${req.params.id}`);
+    const website = await Website.findById(req.params.id);
     if (!website) {
       return res.status(404).json({ message: 'Website not found' });
     }
-    res.json(website);
+
+    console.log(`Website found: ${website.name}, status: ${website.status}`);
+    console.log(`Connection data available:`, !!website.connectionData);
+    console.log(`Connection method:`, website.connectionMethod);
+
+    let responseData = {
+      ...website.toObject(),
+      connectionData: {
+        ...website.connectionData,
+        encryptedPassword: undefined // Remove sensitive data
+      }
+    };
+
+    // If website is connected, fetch detailed plugin and theme data
+    if (website.status === 'connected' && website.connectionData) {
+      try {
+        console.log(`Fetching detailed data for website: ${website.name}`);
+
+        // Create connection data for WordPress API client
+        const connectionData = {
+          method: website.connectionMethod,
+          username: website.connectionData.username,
+          password: website.connectionData.encryptedPassword, // This should contain the app password
+          apiKey: website.connectionData.apiKey
+        };
+
+        console.log(`Connection data for API client:`, {
+          method: connectionData.method,
+          username: connectionData.username,
+          passwordLength: connectionData.password?.length || 0,
+          hasApiKey: !!connectionData.apiKey
+        });
+
+        const wpClient = new WordPressApiClient(website.url, connectionData);
+        const detailedStats = await wpClient.getAdvancedSiteStats();
+
+        console.log(`Advanced stats result:`, {
+          plugins: detailedStats.plugins,
+          themes: detailedStats.themes,
+          detailed_plugins_count: detailedStats.detailed_plugins?.length || 0,
+          detailed_themes_count: detailedStats.detailed_themes?.length || 0,
+          connector_used: detailedStats.connector_used
+        });
+
+        // Add detailed plugin and theme data if available
+        if (detailedStats.detailed_plugins) {
+          responseData.detailedPlugins = detailedStats.detailed_plugins;
+        }
+        if (detailedStats.detailed_themes) {
+          responseData.detailedThemes = detailedStats.detailed_themes;
+        }
+
+        // Also update the basic stats
+        if (detailedStats.plugins !== undefined) {
+          responseData.pluginsCount = detailedStats.plugins;
+        }
+        if (detailedStats.themes !== undefined) {
+          responseData.themesCount = detailedStats.themes;
+        }
+        if (detailedStats.posts !== undefined) {
+          responseData.postsCount = detailedStats.posts;
+        }
+
+        console.log(`Found ${detailedStats.detailed_plugins?.length || 0} plugins and ${detailedStats.detailed_themes?.length || 0} themes`);
+
+      } catch (fetchError) {
+        console.log('Failed to fetch detailed website data:', fetchError.message);
+        console.log('Error details:', fetchError);
+        // Don't fail the request, just log the error and return basic data
+      }
+    } else {
+      console.log(`Skipping detailed data fetch - status: ${website.status}, hasConnectionData: ${!!website.connectionData}`);
+    }
+
+    res.json(responseData);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

@@ -816,6 +816,79 @@ class WordPressApiClient {
       };
     }
   }
+
+  async getAdvancedSiteStats() {
+    const { method, username, password } = this.connectionData;
+
+    if (!username || !password) {
+      throw new Error('Authentication required');
+    }
+
+    try {
+      const cleanPassword = password.replace(/\s+/g, '').trim();
+      const credentials = Buffer.from(`${username}:${cleanPassword}`).toString('base64');
+      const authHeaders = {
+        'Authorization': `Basic ${credentials}`,
+        'User-Agent': 'SparkleWP/1.0',
+        'Accept': 'application/json'
+      };
+
+      console.log(`Fetching advanced site stats for ${this.siteUrl}...`);
+
+      // Try the SparkleWP Connector plugin endpoint first
+      try {
+        console.log('Trying SparkleWP Connector plugin endpoint for advanced data...');
+        const connectorResponse = await axios.get(`${this.siteUrl}/wp-json/sparklewp/v1/site-info`, {
+          headers: authHeaders,
+          timeout: this.timeout,
+          validateStatus: (status) => status < 500
+        });
+
+        console.log(`SparkleWP Connector response status: ${connectorResponse.status}`);
+
+        if (connectorResponse.status === 200 && connectorResponse.data && connectorResponse.data.success) {
+          const data = connectorResponse.data;
+          console.log('SparkleWP Connector data received successfully!');
+          console.log(`Advanced data - Plugins: ${data.plugins?.length || 0}, Themes: ${data.themes?.length || 0}, Posts: ${data.posts_count || 0}`);
+
+          return {
+            plugins: data.plugin_count || data.plugins?.length || 0,
+            themes: data.theme_count || data.themes?.length || 0,
+            posts: data.posts_count || 0,
+            detailed_plugins: data.plugins || [],
+            detailed_themes: data.themes || [],
+            connector_used: true,
+            wp_version: data.wp_version,
+            php_version: data.php_version
+          };
+        }
+      } catch (connectorError) {
+        console.log('SparkleWP Connector plugin not available for advanced data:', connectorError.message);
+        console.log('Falling back to basic stats...');
+      }
+
+      // Fallback to basic stats
+      const basicStats = await this.getSiteStats();
+      return {
+        ...basicStats,
+        detailed_plugins: [],
+        detailed_themes: [],
+        connector_used: false
+      };
+
+    } catch (error) {
+      console.error('Failed to fetch advanced site statistics:', error.message);
+      // Return default values instead of throwing
+      return {
+        plugins: 0,
+        themes: 0,
+        posts: 0,
+        detailed_plugins: [],
+        detailed_themes: [],
+        connector_used: false
+      };
+    }
+  }
 }
 
 module.exports = WordPressApiClient;

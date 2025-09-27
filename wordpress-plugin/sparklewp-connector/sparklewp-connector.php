@@ -620,6 +620,18 @@ class SparkleWP_Connector {
         foreach($all_plugins as $plugin_file => $plugin_info) {
             $is_active = in_array($plugin_file, $active_plugins) || array_key_exists($plugin_file, $network_active_plugins);
 
+            // Check for updates from WordPress.org repository
+            $update_available = false;
+            $latest_version = null;
+            $plugin_slug = dirname($plugin_file);
+
+            if ($plugin_slug && $plugin_slug !== '.') {
+                $latest_version = $this->check_plugin_version($plugin_slug);
+                if ($latest_version && version_compare($plugin_info['Version'], $latest_version, '<')) {
+                    $update_available = true;
+                }
+            }
+
             $plugin_data[] = array(
                 'name' => $plugin_info['Name'],
                 'version' => $plugin_info['Version'],
@@ -627,7 +639,10 @@ class SparkleWP_Connector {
                 'author' => $plugin_info['Author'],
                 'active' => $is_active,
                 'file' => $plugin_file,
-                'network_active' => array_key_exists($plugin_file, $network_active_plugins)
+                'slug' => $plugin_slug,
+                'network_active' => array_key_exists($plugin_file, $network_active_plugins),
+                'update_available' => $update_available,
+                'latest_version' => $latest_version
             );
         }
 
@@ -637,6 +652,15 @@ class SparkleWP_Connector {
 
         $theme_data = array();
         foreach($all_themes as $theme_slug => $theme_obj) {
+            // Check for theme updates from WordPress.org repository
+            $update_available = false;
+            $latest_version = null;
+
+            $latest_version = $this->check_theme_version($theme_slug);
+            if ($latest_version && version_compare($theme_obj->get('Version'), $latest_version, '<')) {
+                $update_available = true;
+            }
+
             $theme_data[] = array(
                 'name' => $theme_obj->get('Name'),
                 'version' => $theme_obj->get('Version'),
@@ -644,7 +668,9 @@ class SparkleWP_Connector {
                 'author' => $theme_obj->get('Author'),
                 'active' => ($theme_slug === $current_theme->get_stylesheet()),
                 'slug' => $theme_slug,
-                'parent' => $theme_obj->get('Template')
+                'parent' => $theme_obj->get('Template'),
+                'update_available' => $update_available,
+                'latest_version' => $latest_version
             );
         }
 
@@ -710,6 +736,68 @@ class SparkleWP_Connector {
         );
 
         return new WP_REST_Response($response_data, 200);
+    }
+
+    /**
+     * Check plugin version from WordPress.org repository
+     */
+    private function check_plugin_version($plugin_slug) {
+        if (empty($plugin_slug)) {
+            return null;
+        }
+
+        // Use WordPress.org API to get plugin information
+        $url = "https://api.wordpress.org/plugins/info/1.0/{$plugin_slug}.json";
+
+        // Use wp_remote_get for better WordPress integration
+        $response = wp_remote_get($url, array(
+            'timeout' => 10,
+            'user-agent' => 'SparkleWP Connector/1.0'
+        ));
+
+        if (is_wp_error($response)) {
+            return null;
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        $plugin_info = json_decode($body, true);
+
+        if (!empty($plugin_info['version'])) {
+            return $plugin_info['version'];
+        }
+
+        return null;
+    }
+
+    /**
+     * Check theme version from WordPress.org repository
+     */
+    private function check_theme_version($theme_slug) {
+        if (empty($theme_slug)) {
+            return null;
+        }
+
+        // Use WordPress.org API to get theme information
+        $url = "https://api.wordpress.org/themes/info/1.1/?action=theme_information&request[slug]={$theme_slug}";
+
+        // Use wp_remote_get for better WordPress integration
+        $response = wp_remote_get($url, array(
+            'timeout' => 10,
+            'user-agent' => 'SparkleWP Connector/1.0'
+        ));
+
+        if (is_wp_error($response)) {
+            return null;
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        $theme_info = json_decode($body, true);
+
+        if (!empty($theme_info['version'])) {
+            return $theme_info['version'];
+        }
+
+        return null;
     }
 }
 
