@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Dashboard from '../pages/Dashboard';
 import Websites from '../pages/Websites';
+import WebsiteSettings from '../pages/WebsiteSettings';
 import Users from '../pages/Users';
 import Logging from '../pages/Logging';
 import Login from '../pages/Login';
@@ -43,19 +44,19 @@ export default function App() {
   };
 
   const contentStyle = {
-    marginLeft: '250px', // Account for fixed sidebar width
+    marginLeft: location.pathname.includes('/settings') ? '0' : '250px', // No sidebar for settings pages
     flex: 1,
     minHeight: '100vh',
-    width: 'calc(100vw - 250px)',
-    maxWidth: 'calc(100vw - 250px)',
+    width: location.pathname.includes('/settings') ? '100vw' : 'calc(100vw - 250px)',
+    maxWidth: location.pathname.includes('/settings') ? '100vw' : 'calc(100vw - 250px)',
     overflow: 'hidden'
   };
 
   // If authenticated, show the full layout with sidebar and content
   return (
     <div style={layoutStyle}>
-      {/* Fixed Sidebar navigation for authenticated users */}
-      <Sidebar />
+      {/* Fixed Sidebar navigation for authenticated users - hide on settings pages */}
+      {!location.pathname.includes('/settings') && <Sidebar />}
 
       {/* Main content area */}
       <div style={contentStyle}>
@@ -63,6 +64,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/websites" element={<PrivateRoute><Websites /></PrivateRoute>} />
+          <Route path="/websites/:id/settings" element={<PrivateRoute><WebsiteSettings /></PrivateRoute>} />
           <Route path="/users" element={<PrivateRoute><Users /></PrivateRoute>} />
           <Route path="/logging" element={<PrivateRoute><Logging /></PrivateRoute>} />
           {/* Redirect any unknown route to dashboard */}
