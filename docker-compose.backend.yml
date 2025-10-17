@@ -1,8 +1,8 @@
 services:
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     image: sparklewp-backend:latest
     pull_policy: always
     container_name: sparklewp-backend
