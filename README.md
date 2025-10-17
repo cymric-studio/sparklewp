@@ -151,7 +151,7 @@ docker-compose -f docker-compose.backend.yml up -d
 docker-compose -f docker-compose.frontend.yml up -d
 ```
 
-Access at: `http://localhost`
+Access at: `http://localhost:3000`
 
 #### Documentation
 - **[Docker Deployment Guide](DOCKER_DEPLOYMENT.md)** - Complete deployment documentation

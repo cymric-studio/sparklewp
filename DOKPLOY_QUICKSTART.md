@@ -75,7 +75,7 @@ Create **3 applications** in Dokploy:
 - **Always Pull Latest:** ✅ ON
 - **Port Mapping:**
   - Container Port: `80`
-  - Host Port: `80` (or custom like `8080`)
+  - Host Port: `3000` (or custom port if needed)
 - **Domain:** Configure your domain in Dokploy
 - **Deploy Order:** **3rd** (after Backend is running)
 

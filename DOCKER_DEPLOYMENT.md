@@ -68,7 +68,7 @@ docker-compose -f docker-compose.frontend.yml up -d --build
 
 This:
 - Builds React production bundle
-- Serves static files via Nginx on port 80
+- Serves static files via Nginx on port 3000
 - Proxies `/api/*` requests to backend container
 
 **Verify Frontend is running:**
@@ -79,7 +79,7 @@ docker logs sparklewp-frontend
 
 ### 4. Access the Application
 
-Open your browser: `http://your-server-ip`
+Open your browser: `http://your-server-ip:3000`
 
 **Default Login:**
 - Username: `admin`
@@ -120,7 +120,7 @@ Open your browser: `http://your-server-ip`
    - Compose File: `docker-compose.frontend.yml`
    - Auto Deploy: ON
    - Pull Latest: ON
-   - Port Mapping: 80:80 (or custom port)
+   - Port Mapping: 3000:80 (host:container)
 
 3. **Deploy Order in Dokploy:**
    - First: Deploy `sparklewp-mongodb`
@@ -244,7 +244,7 @@ docker restart sparklewp-backend
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `REACT_APP_API_URL` | No | `/api` | API endpoint (proxied by Nginx) |
+| `REACT_APP_API_URL` | No | `` (empty) | API endpoint (proxied by Nginx, empty uses relative URLs) |
 
 ## Security Recommendations
 
