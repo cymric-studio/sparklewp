@@ -12,18 +12,26 @@ export const useTheme = () => {
 
 export const ThemeProvider = ({ children }) => {
   const [colorScheme, setColorScheme] = useState(() => {
-    const saved = localStorage.getItem('mantine-color-scheme');
+    const saved = localStorage.getItem('color-scheme');
     return saved || 'light';
   });
 
   const toggleColorScheme = () => {
     const newScheme = colorScheme === 'dark' ? 'light' : 'dark';
     setColorScheme(newScheme);
-    localStorage.setItem('mantine-color-scheme', newScheme);
+    localStorage.setItem('color-scheme', newScheme);
   };
 
   useEffect(() => {
-    localStorage.setItem('mantine-color-scheme', colorScheme);
+    // Update localStorage
+    localStorage.setItem('color-scheme', colorScheme);
+
+    // Update document class for Tailwind dark mode
+    if (colorScheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }, [colorScheme]);
 
   return (

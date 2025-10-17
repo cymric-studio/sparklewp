@@ -1,28 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Container,
-  Title,
-  Button,
-  Table,
-  Modal,
-  TextInput,
-  Select,
-  Group,
-  Stack,
-  Badge,
-  ActionIcon,
-  Alert,
-  LoadingOverlay,
-  Text,
-  Box,
-  Flex,
-  Card,
-  Grid,
-  Textarea,
-  PasswordInput
-} from '@mantine/core';
-import {
   IconPlus,
   IconEdit,
   IconTrash,
@@ -38,6 +16,20 @@ import {
 } from '@tabler/icons-react';
 import { useAuth } from '../services/AuthContext';
 import api from '../services/api';
+import {
+  Input,
+  PasswordInput,
+  Textarea,
+  Button,
+  Badge,
+  Modal,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeader,
+  TableData
+} from '../components/ui';
 
 export default function Websites() {
   const { token, user } = useAuth();
@@ -105,11 +97,11 @@ export default function Websites() {
     }
 
     try {
-      const res = await api.post('/api/websites', formData, { headers: { Authorization: `Bearer ${token}` } });
+      await api.post('/api/websites', formData, { headers: { Authorization: `Bearer ${token}` } });
       setSuccess('Website added successfully. Please configure connection.');
       setModalOpen(false);
       setFormData({ name: '', url: '', description: '' });
-      fetchWebsites(); // Refresh the list
+      fetchWebsites();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to add website');
     }
@@ -126,14 +118,14 @@ export default function Websites() {
     }
 
     try {
-      const res = await api.post(`/api/websites/${connectingWebsite._id}/connect`, connectionData, {
+      await api.post(`/api/websites/${connectingWebsite._id}/connect`, connectionData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess('Website connected successfully!');
       setConnectModalOpen(false);
       setConnectingWebsite(null);
       setConnectionData({ method: 'application_password', username: '', password: '', apiKey: '' });
-      fetchWebsites(); // Refresh the list
+      fetchWebsites();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to connect to website');
     }
@@ -150,7 +142,7 @@ export default function Websites() {
       setSuccess('Website deleted successfully');
       setDeleteModalOpen(false);
       setDeletingWebsite(null);
-      fetchWebsites(); // Refresh the list
+      fetchWebsites();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to delete website');
     }
@@ -161,11 +153,11 @@ export default function Websites() {
     setSuccess('');
 
     try {
-      const res = await api.post(`/api/websites/${website._id}/test`, {}, {
+      await api.post(`/api/websites/${website._id}/test`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess(`Connection test successful for ${website.name}. Site data refreshed.`);
-      fetchWebsites(); // Refresh the list to show updated stats
+      fetchWebsites();
     } catch (err) {
       setError(err.response?.data?.message || 'Connection test failed');
     }
@@ -222,254 +214,148 @@ export default function Websites() {
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        backgroundColor: '#f8f9fa',
-        padding: '40px 48px'
-      }}
-    >
-      <Container size="xl" px="xl">
-        <Stack spacing="xl">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10 px-12">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="space-y-8">
+          {/* Alert Messages */}
           {(error || success) && (
-            <Alert
-              icon={error ? <IconAlertCircle size={16} /> : <IconCheck size={16} />}
-              color={error ? 'red' : 'green'}
-              variant="light"
-              radius="xl"
-              styles={{
-                root: {
-                  padding: '20px 24px',
-                  marginBottom: '16px'
-                }
-              }}
-            >
-              {error || success}
-            </Alert>
+            <div className={`flex items-start space-x-3 p-5 rounded-xl border ${
+              error
+                ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+            }`}>
+              {error ? <IconAlertCircle size={20} className="text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" /> : <IconCheck size={20} className="text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />}
+              <p className={`text-sm ${error ? 'text-red-800 dark:text-red-200' : 'text-green-800 dark:text-green-200'}`}>
+                {error || success}
+              </p>
+            </div>
           )}
 
-          <Flex justify="space-between" align="flex-end" mb="xl" mt="xl" pt="xl">
-            <Box>
-              <Title order={1} size="h1" weight={700} mb="xs" sx={{ fontSize: '2.5rem' }}>
-                Websites
-              </Title>
-              <Text color="dimmed" size="lg" sx={{ fontSize: '1.125rem' }}>
-                Manage your WordPress websites and connections
-              </Text>
-            </Box>
+          {/* Header */}
+          <div className="flex justify-between items-end mb-8 mt-8 pt-8">
+            <div>
+              <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-1">Websites</h1>
+              <p className="text-lg text-gray-500 dark:text-gray-400">Manage your WordPress websites and connections</p>
+            </div>
             <Button
               leftIcon={<IconPlus size={20} />}
               variant="gradient"
-              gradient={{ from: 'blue.6', to: 'blue.8' }}
+              color="blue"
               onClick={() => setModalOpen(true)}
-              radius="xl"
               size="lg"
-              px="xl"
-              styles={{
-                root: {
-                  padding: '14px 32px',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  boxShadow: '0 6px 20px rgba(37, 99, 235, 0.25)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  minWidth: '160px',
-                  '&:hover': {
-                    transform: 'translateY(-3px)',
-                    boxShadow: '0 8px 25px rgba(37, 99, 235, 0.35)',
-                  }
-                }
-              }}
+              className="px-8 min-w-[160px] shadow-blue-500/25 border border-white/10"
             >
               Add Website
             </Button>
-          </Flex>
+          </div>
 
-          <Box sx={{ position: 'relative', padding: '0 8px' }}>
-            <LoadingOverlay visible={loading} overlayBlur={2} />
-            <Table
-              striped
-              highlightOnHover
-              withBorder
-              withColumnBorders
-              sx={{
-                borderRadius: '20px',
-                overflow: 'hidden',
-                backgroundColor: '#ffffff',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                border: '1px solid rgba(0, 0, 0, 0.05)',
-                '& th': {
-                  backgroundColor: '#f8fafc',
-                  padding: '20px 28px',
-                  fontSize: '15px',
-                  fontWeight: 700,
-                  color: '#374151',
-                  borderBottom: '2px solid #e5e7eb',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  textAlign: 'left'
-                },
-                '& td': {
-                  padding: '20px 28px',
-                  borderBottom: '1px solid #f3f4f6',
-                  fontSize: '15px'
-                },
-                '& tbody tr:hover': {
-                  backgroundColor: '#f8fafc'
-                }
-              }}
-            >
-              <thead>
-                <tr>
-                  <th>Website</th>
-                  <th>URL</th>
-                  <th>Status</th>
-                  <th>Details</th>
-                  <th width={180}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {websites.map((website) => (
-                  <tr key={website._id}>
-                    <td>
-                      <Box>
-                        <Text weight={700} size="md" sx={{ fontSize: '16px', color: '#1f2937' }}>
-                          {website.name}
-                        </Text>
-                        {website.description && (
-                          <Text size="sm" color="dimmed" sx={{ marginTop: '4px' }}>
-                            {website.description}
-                          </Text>
-                        )}
-                      </Box>
-                    </td>
-                    <td>
-                      <Group spacing="xs">
-                        <IconWorld size={16} color="#6b7280" />
-                        <Text color="blue" size="md" sx={{ fontSize: '15px' }}>
-                          {website.url}
-                        </Text>
-                      </Group>
-                    </td>
-                    <td>
-                      <Badge
-                        color={getStatusColor(website.status)}
-                        variant="filled"
-                        radius="xl"
-                        size="lg"
-                        styles={{
-                          root: {
-                            padding: '8px 16px',
-                            fontSize: '13px',
-                            fontWeight: 600,
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.5px'
-                          }
-                        }}
-                      >
-                        {getStatusLabel(website.status)}
-                      </Badge>
-                    </td>
-                    <td>
-                      {website.status === 'connected' ? (
-                        <Stack spacing="xs">
-                          <Text size="sm" color="dimmed">
-                            WP {website.wpVersion}
-                          </Text>
-                          <Text size="sm" color="dimmed">
-                            {website.plugins} plugins, {website.themes} themes
-                          </Text>
-                        </Stack>
-                      ) : (
-                        <Text size="sm" color="dimmed">
-                          Not connected
-                        </Text>
-                      )}
-                    </td>
-                    <td>
-                      <Group spacing="md">
-                        {website.status !== 'connected' && (
-                          <ActionIcon
-                            color="green"
-                            size="lg"
-                            variant="subtle"
-                            radius="xl"
-                            onClick={() => openConnectModal(website)}
-                            styles={{
-                              root: {
-                                '&:hover': {
-                                  backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                                  transform: 'scale(1.1)'
-                                }
-                              }
-                            }}
-                          >
-                            <IconLink size={18} />
-                          </ActionIcon>
-                        )}
-                        {website.status === 'connected' && (
-                          <ActionIcon
-                            color="blue"
-                            size="lg"
-                            variant="subtle"
-                            radius="xl"
-                            onClick={() => handleTestConnection(website)}
-                            title="Test Connection & Refresh Data"
-                            styles={{
-                              root: {
-                                '&:hover': {
-                                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                  transform: 'scale(1.1)'
-                                }
-                              }
-                            }}
-                          >
-                            <IconRefresh size={18} />
-                          </ActionIcon>
-                        )}
-                        <ActionIcon
-                          color="gray"
-                          size="lg"
-                          variant="subtle"
-                          radius="xl"
-                          onClick={() => openWebsiteSettings(website)}
-                          disabled={website.status !== 'connected'}
-                          styles={{
-                            root: {
-                              '&:hover': {
-                                backgroundColor: 'rgba(107, 114, 128, 0.1)',
-                                transform: 'scale(1.1)'
-                              },
-                              opacity: website.status !== 'connected' ? 0.5 : 1,
-                              cursor: website.status !== 'connected' ? 'not-allowed' : 'pointer'
-                            }
-                          }}
+          {/* Websites Table */}
+          <div className="relative p-2">
+            {loading && (
+              <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm flex items-center justify-center z-50 rounded-2xl">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-brand-500 border-t-transparent"></div>
+              </div>
+            )}
+            <div className="rounded-2xl overflow-hidden bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700">
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableHeader>Website</TableHeader>
+                    <TableHeader>URL</TableHeader>
+                    <TableHeader>Status</TableHeader>
+                    <TableHeader>Details</TableHeader>
+                    <TableHeader>Actions</TableHeader>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {websites.map((website) => (
+                    <TableRow key={website._id}>
+                      <TableData>
+                        <div>
+                          <div className="font-bold text-base text-gray-900 dark:text-white">
+                            {website.name}
+                          </div>
+                          {website.description && (
+                            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                              {website.description}
+                            </div>
+                          )}
+                        </div>
+                      </TableData>
+                      <TableData>
+                        <div className="flex items-center space-x-2">
+                          <IconWorld size={16} className="text-gray-500 dark:text-gray-400" />
+                          <span className="text-blue-600 dark:text-blue-400">
+                            {website.url}
+                          </span>
+                        </div>
+                      </TableData>
+                      <TableData>
+                        <Badge
+                          color={getStatusColor(website.status)}
+                          variant="filled"
+                          size="md"
+                          className="uppercase tracking-wide"
                         >
-                          <IconSettings size={18} />
-                        </ActionIcon>
-                        <ActionIcon
-                          color="red"
-                          size="lg"
-                          variant="subtle"
-                          radius="xl"
-                          onClick={() => openDeleteModal(website)}
-                          styles={{
-                            root: {
-                              '&:hover': {
-                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                                transform: 'scale(1.1)'
-                              }
-                            }
-                          }}
-                        >
-                          <IconTrash size={18} />
-                        </ActionIcon>
-                      </Group>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Box>
+                          {getStatusLabel(website.status)}
+                        </Badge>
+                      </TableData>
+                      <TableData>
+                        {website.status === 'connected' ? (
+                          <div className="space-y-1">
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                              WP {website.wpVersion}
+                            </div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                              {website.plugins} plugins, {website.themes} themes
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                            Not connected
+                          </div>
+                        )}
+                      </TableData>
+                      <TableData>
+                        <div className="flex items-center space-x-3">
+                          {website.status !== 'connected' && (
+                            <button
+                              onClick={() => openConnectModal(website)}
+                              className="w-9 h-9 flex items-center justify-center rounded-xl text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all hover:scale-110"
+                            >
+                              <IconLink size={18} />
+                            </button>
+                          )}
+                          {website.status === 'connected' && (
+                            <button
+                              onClick={() => handleTestConnection(website)}
+                              title="Test Connection & Refresh Data"
+                              className="w-9 h-9 flex items-center justify-center rounded-xl text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all hover:scale-110"
+                            >
+                              <IconRefresh size={18} />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => openWebsiteSettings(website)}
+                            disabled={website.status !== 'connected'}
+                            className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/20 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <IconSettings size={18} />
+                          </button>
+                          <button
+                            onClick={() => openDeleteModal(website)}
+                            className="w-9 h-9 flex items-center justify-center rounded-xl text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all hover:scale-110"
+                          >
+                            <IconTrash size={18} />
+                          </button>
+                        </div>
+                      </TableData>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
 
           {/* Add Website Modal */}
           <Modal
@@ -477,70 +363,33 @@ export default function Websites() {
             onClose={closeModal}
             title="Add New Website"
             size="lg"
-            radius="xl"
-            styles={{
-              content: {
-                padding: '24px'
-              },
-              header: {
-                padding: '24px 24px 0'
-              },
-              body: {
-                padding: '24px'
-              }
-            }}
           >
-            <form onSubmit={handleAddWebsite}>
-              <Stack spacing="lg">
-                <TextInput
-                  label="Website Name"
-                  placeholder="My WordPress Site"
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  required
-                  radius="md"
-                  size="md"
-                />
-                <TextInput
-                  label="Website URL"
-                  placeholder="https://example.com"
-                  value={formData.url}
-                  onChange={(e) => setFormData({...formData, url: e.target.value})}
-                  required
-                  radius="md"
-                  size="md"
-                />
-                <Textarea
-                  label="Description (Optional)"
-                  placeholder="Brief description of this website"
-                  value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  radius="md"
-                  size="md"
-                  minRows={3}
-                />
-                <Group position="right" mt="xl">
-                  <Button
-                    variant="light"
-                    onClick={closeModal}
-                    radius="xl"
-                    size="md"
-                    px="xl"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="gradient"
-                    gradient={{ from: 'blue.6', to: 'blue.8' }}
-                    radius="xl"
-                    size="md"
-                    px="xl"
-                  >
-                    Add Website
-                  </Button>
-                </Group>
-              </Stack>
+            <form onSubmit={handleAddWebsite} className="space-y-6">
+              <Input
+                label="Website Name"
+                placeholder="My WordPress Site"
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                required
+              />
+              <Input
+                label="Website URL"
+                placeholder="https://example.com"
+                value={formData.url}
+                onChange={(e) => setFormData({...formData, url: e.target.value})}
+                required
+              />
+              <Textarea
+                label="Description (Optional)"
+                placeholder="Brief description of this website"
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                rows={3}
+              />
+              <div className="flex justify-end space-x-3 mt-8">
+                <Button variant="light" color="gray" onClick={closeModal} size="md">Cancel</Button>
+                <Button type="submit" variant="gradient" color="blue" size="md">Add Website</Button>
+              </div>
             </form>
           </Modal>
 
@@ -550,97 +399,64 @@ export default function Websites() {
             onClose={closeModal}
             title="Connect to WordPress"
             size="lg"
-            radius="xl"
-            styles={{
-              content: {
-                padding: '24px'
-              },
-              header: {
-                padding: '24px 24px 0'
-              },
-              body: {
-                padding: '24px'
-              }
-            }}
           >
             {connectingWebsite && (
-              <form onSubmit={handleConnectWebsite}>
-                <Stack spacing="lg">
-                  <Box>
-                    <Text weight={600} size="md" mb="xs">
-                      Connecting to: {connectingWebsite.name}
-                    </Text>
-                    <Text size="sm" color="dimmed">
-                      {connectingWebsite.url}
-                    </Text>
-                  </Box>
+              <form onSubmit={handleConnectWebsite} className="space-y-6">
+                <div>
+                  <div className="font-semibold text-base text-gray-900 dark:text-white mb-1">
+                    Connecting to: {connectingWebsite.name}
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {connectingWebsite.url}
+                  </div>
+                </div>
 
-                  <Select
-                    label="Connection Method"
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Connection Method</label>
+                  <select
                     value={connectionData.method}
-                    onChange={(value) => setConnectionData({...connectionData, method: value})}
-                    data={connectionMethods}
-                    radius="md"
-                    size="md"
-                  />
+                    onChange={(e) => setConnectionData({...connectionData, method: e.target.value})}
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-900/50 transition-all duration-200"
+                  >
+                    {connectionMethods.map((method) => (
+                      <option key={method.value} value={method.value} disabled={method.disabled}>
+                        {method.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-                  {connectionData.method === 'application_password' && (
-                    <>
-                      <Alert
-                        icon={<IconShield size={16} />}
-                        color="blue"
-                        variant="light"
-                        radius="md"
-                      >
-                        <Text size="sm">
-                          <strong>Recommended:</strong> Application passwords are the most secure way to connect.
-                          Create one in WordPress Admin → Users → Your Profile → Application Passwords.
-                        </Text>
-                      </Alert>
+                {connectionData.method === 'application_password' && (
+                  <>
+                    <div className="flex items-start space-x-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                      <IconShield size={20} className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                      <div className="text-sm text-blue-800 dark:text-blue-200">
+                        <strong>Recommended:</strong> Application passwords are the most secure way to connect.
+                        Create one in WordPress Admin → Users → Your Profile → Application Passwords.
+                      </div>
+                    </div>
 
-                      <TextInput
-                        label="WordPress Username"
-                        placeholder="admin"
-                        value={connectionData.username}
-                        onChange={(e) => setConnectionData({...connectionData, username: e.target.value})}
-                        required
-                        radius="md"
-                        size="md"
-                      />
-                      <PasswordInput
-                        label="Application Password"
-                        placeholder="xxxx xxxx xxxx xxxx xxxx xxxx"
-                        value={connectionData.password}
-                        onChange={(e) => setConnectionData({...connectionData, password: e.target.value})}
-                        required
-                        radius="md"
-                        size="md"
-                      />
-                    </>
-                  )}
+                    <Input
+                      label="WordPress Username"
+                      placeholder="admin"
+                      value={connectionData.username}
+                      onChange={(e) => setConnectionData({...connectionData, username: e.target.value})}
+                      required
+                    />
+                    <PasswordInput
+                      label="Application Password"
+                      placeholder="xxxx xxxx xxxx xxxx xxxx xxxx"
+                      value={connectionData.password}
+                      onChange={(e) => setConnectionData({...connectionData, password: e.target.value})}
+                      required
+                    />
+                  </>
+                )}
 
-                  <Group position="right" mt="xl">
-                    <Button
-                      variant="light"
-                      onClick={closeModal}
-                      radius="xl"
-                      size="md"
-                      px="xl"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
-                      variant="gradient"
-                      gradient={{ from: 'green.6', to: 'green.8' }}
-                      radius="xl"
-                      size="md"
-                      px="xl"
-                    >
-                      Connect
-                    </Button>
-                  </Group>
-                </Stack>
+                <div className="flex justify-end space-x-3 mt-8">
+                  <Button variant="light" color="gray" onClick={closeModal} size="md">Cancel</Button>
+                  <Button type="submit" variant="gradient" color="green" size="md">Connect</Button>
+                </div>
               </form>
             )}
           </Modal>
@@ -651,38 +467,21 @@ export default function Websites() {
             onClose={closeModal}
             title="Delete Website"
             size="md"
-            radius="xl"
-            styles={{
-              content: {
-                padding: '24px'
-              },
-              header: {
-                padding: '24px 24px 0'
-              },
-              body: {
-                padding: '24px'
-              }
-            }}
           >
             {deletingWebsite && (
-              <Stack spacing="md">
-                <Text>
+              <div className="space-y-5">
+                <p className="text-gray-700 dark:text-gray-300">
                   Are you sure you want to delete "{deletingWebsite.name}"? This action cannot be undone.
-                </Text>
-                <Group position="right" mt="md">
-                  <Button variant="light" onClick={closeModal}>
-                    Cancel
-                  </Button>
-                  <Button color="red" onClick={handleDeleteWebsite}>
-                    Delete Website
-                  </Button>
-                </Group>
-              </Stack>
+                </p>
+                <div className="flex justify-end space-x-3 mt-6">
+                  <Button variant="light" color="gray" onClick={closeModal}>Cancel</Button>
+                  <Button color="red" onClick={handleDeleteWebsite}>Delete Website</Button>
+                </div>
+              </div>
             )}
           </Modal>
-
-        </Stack>
-      </Container>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }

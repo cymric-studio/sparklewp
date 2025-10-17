@@ -1,27 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 import {
-  Container,
-  Title,
-  Button,
-  Table,
-  Group,
-  Stack,
-  Badge,
-  Alert,
-  LoadingOverlay,
-  Text,
-  Box,
-  Flex,
-  Card,
-  Switch,
-  NumberInput,
-  ActionIcon,
-  Modal,
-  Code,
-  ScrollArea,
-  Select
-} from '@mantine/core';
-import {
   IconAlertCircle,
   IconCheck,
   IconFileText,
@@ -34,6 +12,18 @@ import {
 } from '@tabler/icons-react';
 import { useAuth } from '../services/AuthContext';
 import api from '../services/api';
+import {
+  Button,
+  Badge,
+  Modal,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeader,
+  TableData,
+  Card
+} from '../components/ui';
 
 export default function Logging() {
   const { token } = useAuth();
@@ -112,7 +102,7 @@ export default function Logging() {
 
   useEffect(() => {
     if (autoRefresh) {
-      refreshInterval.current = setInterval(fetchLogs, 5000); // Refresh every 5 seconds
+      refreshInterval.current = setInterval(fetchLogs, 5000);
     } else {
       if (refreshInterval.current) {
         clearInterval(refreshInterval.current);
@@ -139,7 +129,10 @@ export default function Logging() {
     }
   };
 
-  const handleUpdateMaxSize = async (size) => {
+  const handleUpdateMaxSize = async (e) => {
+    const size = parseInt(e.target.value);
+    if (size < 100 || size > 10000) return;
+
     try {
       await api.post('/api/logs/settings', { maxSize: size }, {
         headers: { Authorization: `Bearer ${token}` }
@@ -202,304 +195,228 @@ export default function Logging() {
   });
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        backgroundColor: '#f8f9fa',
-        padding: '40px 48px'
-      }}
-    >
-      <Container size="xl" px="xl">
-        <Stack spacing="xl">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10 px-12">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="space-y-8">
+          {/* Alert Messages */}
           {(error || success) && (
-            <Alert
-              icon={error ? <IconAlertCircle size={16} /> : <IconCheck size={16} />}
-              color={error ? 'red' : 'green'}
-              variant="light"
-              radius="xl"
-              styles={{
-                root: {
-                  padding: '20px 24px',
-                  marginBottom: '16px'
-                }
-              }}
-              onClose={() => { setError(''); setSuccess(''); }}
-              withCloseButton
-            >
-              {error || success}
-            </Alert>
+            <div className={`flex items-start justify-between space-x-3 p-5 rounded-xl border ${
+              error
+                ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+            }`}>
+              <div className="flex items-start space-x-3">
+                {error ? <IconAlertCircle size={20} className="text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" /> : <IconCheck size={20} className="text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />}
+                <p className={`text-sm ${error ? 'text-red-800 dark:text-red-200' : 'text-green-800 dark:text-green-200'}`}>
+                  {error || success}
+                </p>
+              </div>
+              <button onClick={() => { setError(''); setSuccess(''); }} className="text-gray-400 hover:text-gray-600">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
           )}
 
-          <Flex justify="space-between" align="flex-end" mb="xl" mt="xl" pt="xl">
-            <Box>
-              <Title order={1} size="h1" weight={700} mb="xs" sx={{ fontSize: '2.5rem' }}>
-                Logging
-              </Title>
-              <Text color="dimmed" size="lg" sx={{ fontSize: '1.125rem' }}>
-                Monitor and debug API requests for troubleshooting
-              </Text>
-            </Box>
-            <Group spacing="md">
+          {/* Header */}
+          <div className="flex justify-between items-end mb-8 mt-8 pt-8">
+            <div>
+              <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-1">Logging</h1>
+              <p className="text-lg text-gray-500 dark:text-gray-400">Monitor and debug API requests for troubleshooting</p>
+            </div>
+            <div className="flex items-center space-x-4">
               <Button
                 leftIcon={<IconTrash size={18} />}
                 color="red"
                 variant="outline"
-                radius="xl"
-                size="md"
                 onClick={handleClearLogs}
+                size="md"
               >
                 Clear All
               </Button>
-              <ActionIcon
-                size="lg"
-                variant="outline"
-                radius="xl"
+              <button
                 onClick={fetchLogs}
-                loading={loading}
+                disabled={loading}
+                className="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
               >
-                <IconRefresh size={18} />
-              </ActionIcon>
-            </Group>
-          </Flex>
+                <IconRefresh size={18} className={loading ? 'animate-spin' : ''} />
+              </button>
+            </div>
+          </div>
 
           {/* Settings Card */}
-          <Card
-            shadow="sm"
-            padding="xl"
-            radius="xl"
-            withBorder
-            sx={{
-              backgroundColor: '#ffffff',
-              border: '1px solid rgba(0, 0, 0, 0.05)'
-            }}
-          >
-            <Group position="apart" mb="md">
-              <Text weight={600} size="lg">Logging Settings</Text>
-              <IconSettings size={20} color="#6b7280" />
-            </Group>
+          <Card shadow="sm" padding="xl" withBorder>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Logging Settings</h3>
+              <IconSettings size={20} className="text-gray-500" />
+            </div>
 
-            <Group spacing="xl">
-              <Switch
-                label="Enable Request Logging"
-                description="Log all API requests for debugging"
-                checked={loggingEnabled}
-                onChange={(event) => handleToggleLogging(event.currentTarget.checked)}
-                size="md"
-              />
+            <div className="flex flex-wrap gap-8">
+              {/* Enable Logging Toggle */}
+              <div className="flex flex-col space-y-1">
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={loggingEnabled}
+                    onChange={(e) => handleToggleLogging(e.target.checked)}
+                    className="w-11 h-6 appearance-none bg-gray-300 dark:bg-gray-600 rounded-full cursor-pointer transition-colors relative checked:bg-blue-600 before:content-[''] before:absolute before:w-5 before:h-5 before:bg-white before:rounded-full before:top-0.5 before:left-0.5 before:transition-transform checked:before:translate-x-5"
+                  />
+                  <div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">Enable Request Logging</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">Log all API requests for debugging</div>
+                  </div>
+                </label>
+              </div>
 
-              <NumberInput
-                label="Maximum Log Entries"
-                description="Limit the number of stored log entries"
-                value={maxLogSize}
-                onChange={handleUpdateMaxSize}
-                min={100}
-                max={10000}
-                step={100}
-                style={{ minWidth: '200px' }}
-                size="md"
-              />
+              {/* Max Log Size */}
+              <div className="flex flex-col space-y-1 min-w-[200px]">
+                <label className="text-sm font-medium text-gray-900 dark:text-white">Maximum Log Entries</label>
+                <input
+                  type="number"
+                  value={maxLogSize}
+                  onChange={handleUpdateMaxSize}
+                  min={100}
+                  max={10000}
+                  step={100}
+                  className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-900/50"
+                />
+                <div className="text-xs text-gray-500 dark:text-gray-400">Limit stored log entries</div>
+              </div>
 
-              <Switch
-                label="Auto Refresh"
-                description="Automatically refresh logs every 5 seconds"
-                checked={autoRefresh}
-                onChange={(event) => handleAutoRefreshToggle(event.currentTarget.checked)}
-                size="md"
-              />
-            </Group>
+              {/* Auto Refresh Toggle */}
+              <div className="flex flex-col space-y-1">
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={autoRefresh}
+                    onChange={(e) => handleAutoRefreshToggle(e.target.checked)}
+                    className="w-11 h-6 appearance-none bg-gray-300 dark:bg-gray-600 rounded-full cursor-pointer transition-colors relative checked:bg-blue-600 before:content-[''] before:absolute before:w-5 before:h-5 before:bg-white before:rounded-full before:top-0.5 before:left-0.5 before:transition-transform checked:before:translate-x-5"
+                  />
+                  <div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">Auto Refresh</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">Refresh every 5 seconds</div>
+                  </div>
+                </label>
+              </div>
+            </div>
           </Card>
 
           {/* Filters */}
-          <Card
-            shadow="sm"
-            padding="lg"
-            radius="xl"
-            withBorder
-            sx={{
-              backgroundColor: '#ffffff',
-              border: '1px solid rgba(0, 0, 0, 0.05)'
-            }}
-          >
-            <Group spacing="md">
-              <IconFilter size={18} color="#6b7280" />
-              <Text weight={500}>Filters:</Text>
-              <Select
-                placeholder="All Methods"
+          <Card shadow="sm" padding="lg" withBorder>
+            <div className="flex items-center space-x-4 flex-wrap">
+              <IconFilter size={18} className="text-gray-500" />
+              <span className="font-medium text-gray-900 dark:text-white">Filters:</span>
+
+              <select
                 value={filterMethod}
-                onChange={handleFilterMethodChange}
-                data={[
-                  { value: 'all', label: 'All Methods' },
-                  { value: 'get', label: 'GET' },
-                  { value: 'post', label: 'POST' },
-                  { value: 'put', label: 'PUT' },
-                  { value: 'patch', label: 'PATCH' },
-                  { value: 'delete', label: 'DELETE' }
-                ]}
-                size="sm"
-                style={{ minWidth: '130px' }}
-              />
-              <Select
-                placeholder="All Status"
+                onChange={(e) => handleFilterMethodChange(e.target.value)}
+                className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-brand-500 min-w-[130px]"
+              >
+                <option value="all">All Methods</option>
+                <option value="get">GET</option>
+                <option value="post">POST</option>
+                <option value="put">PUT</option>
+                <option value="patch">PATCH</option>
+                <option value="delete">DELETE</option>
+              </select>
+
+              <select
                 value={filterStatus}
-                onChange={handleFilterStatusChange}
-                data={[
-                  { value: 'all', label: 'All Status' },
-                  { value: 'success', label: 'Success (2xx)' },
-                  { value: 'error', label: 'Error (4xx, 5xx)' }
-                ]}
-                size="sm"
-                style={{ minWidth: '130px' }}
-              />
-              <Text size="sm" color="dimmed">
+                onChange={(e) => handleFilterStatusChange(e.target.value)}
+                className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-brand-500 min-w-[130px]"
+              >
+                <option value="all">All Status</option>
+                <option value="success">Success (2xx)</option>
+                <option value="error">Error (4xx, 5xx)</option>
+              </select>
+
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 Showing {filteredLogs.length} of {logs.length} entries
-              </Text>
-            </Group>
+              </span>
+            </div>
           </Card>
 
           {/* Logs Table */}
-          <Box sx={{ position: 'relative', padding: '0 8px' }}>
-            <LoadingOverlay visible={loading} overlayBlur={2} />
-            <Table
-              striped
-              highlightOnHover
-              withBorder
-              withColumnBorders
-              sx={{
-                borderRadius: '20px',
-                overflow: 'hidden',
-                backgroundColor: '#ffffff',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                border: '1px solid rgba(0, 0, 0, 0.05)',
-                '& th': {
-                  backgroundColor: '#f8fafc',
-                  padding: '20px 28px',
-                  fontSize: '15px',
-                  fontWeight: 700,
-                  color: '#374151',
-                  borderBottom: '2px solid #e5e7eb',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  textAlign: 'left'
-                },
-                '& td': {
-                  padding: '20px 28px',
-                  borderBottom: '1px solid #f3f4f6',
-                  fontSize: '15px'
-                },
-                '& tbody tr:hover': {
-                  backgroundColor: '#f8fafc'
-                }
-              }}
-            >
-              <thead>
-                <tr>
-                  <th>Time</th>
-                  <th>Method</th>
-                  <th>Endpoint</th>
-                  <th>Status</th>
-                  <th>Response Time</th>
-                  <th>User</th>
-                  <th width={120}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredLogs.map((log) => (
-                  <tr key={log._id}>
-                    <td>
-                      <Text size="sm" weight={500}>
-                        {new Date(log.timestamp).toLocaleTimeString()}
-                      </Text>
-                      <Text size="xs" color="dimmed">
-                        {new Date(log.timestamp).toLocaleDateString()}
-                      </Text>
-                    </td>
-                    <td>
-                      <Badge
-                        color={getMethodColor(log.method)}
-                        variant="filled"
-                        size="md"
-                        radius="md"
-                      >
-                        {log.method}
-                      </Badge>
-                    </td>
-                    <td>
-                      <Code
-                        sx={{
-                          backgroundColor: '#f8fafc',
-                          padding: '4px 8px',
-                          fontSize: '14px',
-                          fontWeight: 500
-                        }}
-                      >
-                        {log.url}
-                      </Code>
-                    </td>
-                    <td>
-                      <Badge
-                        color={getStatusColor(log.statusCode)}
-                        variant="filled"
-                        size="md"
-                        radius="md"
-                      >
-                        {log.statusCode}
-                      </Badge>
-                    </td>
-                    <td>
-                      <Text weight={500} size="sm">
-                        {log.responseTime}ms
-                      </Text>
-                    </td>
-                    <td>
-                      <Text size="sm">
-                        {log.userId || 'Anonymous'}
-                      </Text>
-                    </td>
-                    <td>
-                      <Group spacing="xs">
-                        <ActionIcon
-                          color="green"
-                          size="lg"
-                          variant="subtle"
-                          radius="xl"
-                          onClick={() => openRequestBody(log)}
-                          title="View Request Body"
-                          styles={{
-                            root: {
-                              '&:hover': {
-                                backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                                transform: 'scale(1.1)'
-                              }
-                            }
-                          }}
-                        >
-                          <IconCode size={18} />
-                        </ActionIcon>
-                        <ActionIcon
-                          color="blue"
-                          size="lg"
-                          variant="subtle"
-                          radius="xl"
-                          onClick={() => openLogDetail(log)}
-                          title="View Full Details"
-                          styles={{
-                            root: {
-                              '&:hover': {
-                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                transform: 'scale(1.1)'
-                              }
-                            }
-                          }}
-                        >
-                          <IconEye size={18} />
-                        </ActionIcon>
-                      </Group>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Box>
+          <div className="relative p-2">
+            {loading && (
+              <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm flex items-center justify-center z-50 rounded-2xl">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-brand-500 border-t-transparent"></div>
+              </div>
+            )}
+            <div className="rounded-2xl overflow-hidden bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700">
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableHeader>Time</TableHeader>
+                    <TableHeader>Method</TableHeader>
+                    <TableHeader>Endpoint</TableHeader>
+                    <TableHeader>Status</TableHeader>
+                    <TableHeader>Response Time</TableHeader>
+                    <TableHeader>User</TableHeader>
+                    <TableHeader>Actions</TableHeader>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredLogs.map((log) => (
+                    <TableRow key={log._id}>
+                      <TableData>
+                        <div className="font-medium text-sm text-gray-900 dark:text-white">
+                          {new Date(log.timestamp).toLocaleTimeString()}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {new Date(log.timestamp).toLocaleDateString()}
+                        </div>
+                      </TableData>
+                      <TableData>
+                        <Badge color={getMethodColor(log.method)} variant="filled" size="md">
+                          {log.method}
+                        </Badge>
+                      </TableData>
+                      <TableData>
+                        <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm font-mono text-gray-900 dark:text-gray-100">
+                          {log.url}
+                        </code>
+                      </TableData>
+                      <TableData>
+                        <Badge color={getStatusColor(log.statusCode)} variant="filled" size="md">
+                          {log.statusCode}
+                        </Badge>
+                      </TableData>
+                      <TableData>
+                        <span className="font-medium text-sm text-gray-900 dark:text-white">
+                          {log.responseTime}ms
+                        </span>
+                      </TableData>
+                      <TableData>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                          {log.userId || 'Anonymous'}
+                        </span>
+                      </TableData>
+                      <TableData>
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => openRequestBody(log)}
+                            title="View Request Body"
+                            className="w-9 h-9 flex items-center justify-center rounded-xl text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all hover:scale-110"
+                          >
+                            <IconCode size={18} />
+                          </button>
+                          <button
+                            onClick={() => openLogDetail(log)}
+                            title="View Full Details"
+                            className="w-9 h-9 flex items-center justify-center rounded-xl text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all hover:scale-110"
+                          >
+                            <IconEye size={18} />
+                          </button>
+                        </div>
+                      </TableData>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
 
           {/* Log Detail Modal */}
           <Modal
@@ -507,75 +424,61 @@ export default function Logging() {
             onClose={() => setDetailModalOpen(false)}
             title={selectedLog ? `${selectedLog.method} ${selectedLog.url}` : 'Log Details'}
             size="xl"
-            radius="xl"
-            styles={{
-              content: {
-                padding: '24px'
-              },
-              header: {
-                padding: '24px 24px 0'
-              },
-              body: {
-                padding: '24px'
-              }
-            }}
           >
             {selectedLog && (
-              <Stack spacing="lg">
-                <Group spacing="xl">
-                  <Box>
-                    <Text size="sm" color="dimmed" mb={4}>Status Code</Text>
+              <div className="space-y-6">
+                <div className="flex flex-wrap gap-6">
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Status Code</div>
                     <Badge color={getStatusColor(selectedLog.statusCode)} size="lg">
                       {selectedLog.statusCode}
                     </Badge>
-                  </Box>
-                  <Box>
-                    <Text size="sm" color="dimmed" mb={4}>Response Time</Text>
-                    <Text weight={600}>{selectedLog.responseTime}ms</Text>
-                  </Box>
-                  <Box>
-                    <Text size="sm" color="dimmed" mb={4}>IP Address</Text>
-                    <Code>{selectedLog.ip}</Code>
-                  </Box>
-                  <Box>
-                    <Text size="sm" color="dimmed" mb={4}>User Agent</Text>
-                    <Text size="sm" style={{ maxWidth: '300px', wordBreak: 'break-word' }}>
-                      {selectedLog.userAgent}
-                    </Text>
-                  </Box>
-                </Group>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Response Time</div>
+                    <div className="font-semibold text-gray-900 dark:text-white">{selectedLog.responseTime}ms</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">IP Address</div>
+                    <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm text-gray-900 dark:text-gray-100">{selectedLog.ip}</code>
+                  </div>
+                  <div className="max-w-xs">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">User Agent</div>
+                    <div className="text-sm text-gray-700 dark:text-gray-300 break-words">{selectedLog.userAgent}</div>
+                  </div>
+                </div>
 
-                <Box>
-                  <Text weight={600} mb="sm">Request Headers</Text>
-                  <ScrollArea style={{ maxHeight: '200px' }}>
-                    <Code block>
+                <div>
+                  <div className="font-semibold text-gray-900 dark:text-white mb-2">Request Headers</div>
+                  <div className="max-h-[200px] overflow-auto">
+                    <pre className="bg-gray-100 dark:bg-gray-700 p-3 rounded text-xs text-gray-900 dark:text-gray-100 overflow-x-auto">
                       {JSON.stringify(selectedLog.headers, null, 2)}
-                    </Code>
-                  </ScrollArea>
-                </Box>
+                    </pre>
+                  </div>
+                </div>
 
                 {selectedLog.requestBody && (
-                  <Box>
-                    <Text weight={600} mb="sm">Request Body</Text>
-                    <ScrollArea style={{ maxHeight: '200px' }}>
-                      <Code block>
+                  <div>
+                    <div className="font-semibold text-gray-900 dark:text-white mb-2">Request Body</div>
+                    <div className="max-h-[200px] overflow-auto">
+                      <pre className="bg-gray-100 dark:bg-gray-700 p-3 rounded text-xs text-gray-900 dark:text-gray-100 overflow-x-auto">
                         {JSON.stringify(selectedLog.requestBody, null, 2)}
-                      </Code>
-                    </ScrollArea>
-                  </Box>
+                      </pre>
+                    </div>
+                  </div>
                 )}
 
                 {selectedLog.responseBody && (
-                  <Box>
-                    <Text weight={600} mb="sm">Response Body</Text>
-                    <ScrollArea style={{ maxHeight: '200px' }}>
-                      <Code block>
+                  <div>
+                    <div className="font-semibold text-gray-900 dark:text-white mb-2">Response Body</div>
+                    <div className="max-h-[200px] overflow-auto">
+                      <pre className="bg-gray-100 dark:bg-gray-700 p-3 rounded text-xs text-gray-900 dark:text-gray-100 overflow-x-auto">
                         {JSON.stringify(selectedLog.responseBody, null, 2)}
-                      </Code>
-                    </ScrollArea>
-                  </Box>
+                      </pre>
+                    </div>
+                  </div>
                 )}
-              </Stack>
+              </div>
             )}
           </Modal>
 
@@ -585,85 +488,73 @@ export default function Logging() {
             onClose={() => setRequestBodyModalOpen(false)}
             title={selectedRequestBody ? `Request Body - ${selectedRequestBody.method} ${selectedRequestBody.url}` : 'Request Body'}
             size="lg"
-            radius="xl"
-            styles={{
-              content: {
-                padding: '24px'
-              },
-              header: {
-                padding: '24px 24px 0'
-              },
-              body: {
-                padding: '24px'
-              }
-            }}
           >
             {selectedRequestBody && (
-              <Stack spacing="md">
-                <Group spacing="xl">
-                  <Box>
-                    <Text size="sm" color="dimmed" mb={4}>Method</Text>
+              <div className="space-y-5">
+                <div className="flex flex-wrap gap-6">
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Method</div>
                     <Badge color={getMethodColor(selectedRequestBody.method)} size="lg">
                       {selectedRequestBody.method}
                     </Badge>
-                  </Box>
-                  <Box>
-                    <Text size="sm" color="dimmed" mb={4}>Status</Text>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Status</div>
                     <Badge color={getStatusColor(selectedRequestBody.statusCode)} size="lg">
                       {selectedRequestBody.statusCode}
                     </Badge>
-                  </Box>
-                  <Box>
-                    <Text size="sm" color="dimmed" mb={4}>Time</Text>
-                    <Text weight={600}>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Time</div>
+                    <div className="font-semibold text-gray-900 dark:text-white">
                       {new Date(selectedRequestBody.timestamp).toLocaleString()}
-                    </Text>
-                  </Box>
-                </Group>
+                    </div>
+                  </div>
+                </div>
 
-                <Box>
-                  <Text weight={600} mb="sm">Endpoint</Text>
-                  <Code block>
+                <div>
+                  <div className="font-semibold text-gray-900 dark:text-white mb-2">Endpoint</div>
+                  <pre className="bg-gray-100 dark:bg-gray-700 p-3 rounded text-sm text-gray-900 dark:text-gray-100">
                     {selectedRequestBody.url}
-                  </Code>
-                </Box>
+                  </pre>
+                </div>
 
                 {selectedRequestBody.requestQuery && Object.keys(selectedRequestBody.requestQuery).length > 0 && (
-                  <Box>
-                    <Text weight={600} mb="sm">Query Parameters</Text>
-                    <ScrollArea style={{ maxHeight: '200px' }}>
-                      <Code block>
+                  <div>
+                    <div className="font-semibold text-gray-900 dark:text-white mb-2">Query Parameters</div>
+                    <div className="max-h-[200px] overflow-auto">
+                      <pre className="bg-gray-100 dark:bg-gray-700 p-3 rounded text-xs text-gray-900 dark:text-gray-100 overflow-x-auto">
                         {JSON.stringify(selectedRequestBody.requestQuery, null, 2)}
-                      </Code>
-                    </ScrollArea>
-                  </Box>
+                      </pre>
+                    </div>
+                  </div>
                 )}
 
                 {selectedRequestBody.requestBody && (
-                  <Box>
-                    <Text weight={600} mb="sm">Request Body</Text>
-                    <ScrollArea style={{ maxHeight: '300px' }}>
-                      <Code block>
+                  <div>
+                    <div className="font-semibold text-gray-900 dark:text-white mb-2">Request Body</div>
+                    <div className="max-h-[300px] overflow-auto">
+                      <pre className="bg-gray-100 dark:bg-gray-700 p-3 rounded text-xs text-gray-900 dark:text-gray-100 overflow-x-auto">
                         {typeof selectedRequestBody.requestBody === 'string'
                           ? selectedRequestBody.requestBody
                           : JSON.stringify(selectedRequestBody.requestBody, null, 2)}
-                      </Code>
-                    </ScrollArea>
-                  </Box>
+                      </pre>
+                    </div>
+                  </div>
                 )}
 
                 {!selectedRequestBody.requestBody && (
-                  <Box>
-                    <Text size="sm" color="dimmed" style={{ fontStyle: 'italic' }}>
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 italic">
                       No request body data available
-                    </Text>
-                  </Box>
+                    </p>
+                  </div>
                 )}
-              </Stack>
+              </div>
             )}
           </Modal>
-        </Stack>
-      </Container>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }

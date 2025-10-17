@@ -1,24 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Container,
-  Title,
-  Button,
-  Table,
-  Modal,
-  TextInput,
-  PasswordInput,
-  Select,
-  Group,
-  Stack,
-  Badge,
-  ActionIcon,
-  Alert,
-  LoadingOverlay,
-  Text,
-  Box,
-  Flex
-} from '@mantine/core';
-import {
   IconPlus,
   IconEdit,
   IconTrash,
@@ -27,6 +8,19 @@ import {
 } from '@tabler/icons-react';
 import { useAuth } from '../services/AuthContext';
 import api from '../services/api';
+import {
+  Input,
+  PasswordInput,
+  Button,
+  Badge,
+  Modal,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeader,
+  TableData
+} from '../components/ui';
 
 export default function Users() {
   const { token, user } = useAuth();
@@ -101,7 +95,7 @@ export default function Users() {
     try {
       const updateData = {};
 
-      // Only include role if user is not admin (since admin role field is hidden)
+      // Only include role if user is not admin
       if (editingUser.role !== 'administrator') {
         updateData.role = editingUser.role;
       }
@@ -155,15 +149,15 @@ export default function Users() {
     }
   };
 
-  const openEditModal = (user) => {
-    setEditingUser({ ...user, password: '' });
+  const openEditModal = (userItem) => {
+    setEditingUser({ ...userItem, password: '' });
     setEditModalOpen(true);
     setError('');
     setSuccess('');
   };
 
-  const openDeleteModal = (user) => {
-    setDeletingUser(user);
+  const openDeleteModal = (userItem) => {
+    setDeletingUser(userItem);
     setDeleteModalOpen(true);
     setError('');
     setSuccess('');
@@ -180,189 +174,106 @@ export default function Users() {
     setSuccess('');
   };
 
-
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        backgroundColor: '#f8f9fa',
-        padding: '40px 48px'
-      }}
-    >
-      <Container size="xl" px="xl">
-        <Stack spacing="xl">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10 px-12">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="space-y-8">
+          {/* Alert Messages */}
           {(error || success) && (
-            <Alert
-              icon={error ? <IconAlertCircle size={16} /> : <IconCheck size={16} />}
-              color={error ? 'red' : 'green'}
-              variant="light"
-              radius="xl"
-              styles={{
-                root: {
-                  padding: '20px 24px',
-                  marginBottom: '16px'
-                }
-              }}
-            >
-              {error || success}
-            </Alert>
+            <div className={`flex items-start space-x-3 p-5 rounded-xl border ${
+              error
+                ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+            }`}>
+              {error ? <IconAlertCircle size={20} className="text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" /> : <IconCheck size={20} className="text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />}
+              <p className={`text-sm ${error ? 'text-red-800 dark:text-red-200' : 'text-green-800 dark:text-green-200'}`}>
+                {error || success}
+              </p>
+            </div>
           )}
 
-          <Flex justify="space-between" align="flex-end" mb="xl" mt="xl" pt="xl">
-            <Box>
-              <Title order={1} size="h1" weight={700} mb="xs" sx={{ fontSize: '2.5rem' }}>
-                Users
-              </Title>
-              <Text color="dimmed" size="lg" sx={{ fontSize: '1.125rem' }}>
-                Manage user accounts and permissions
-              </Text>
-            </Box>
+          {/* Header */}
+          <div className="flex justify-between items-end mb-8 mt-8 pt-8">
+            <div>
+              <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-1">Users</h1>
+              <p className="text-lg text-gray-500 dark:text-gray-400">Manage user accounts and permissions</p>
+            </div>
             <Button
               leftIcon={<IconPlus size={20} />}
               variant="gradient"
-              gradient={{ from: 'blue.6', to: 'blue.8' }}
+              color="blue"
               onClick={() => setModalOpen(true)}
-              radius="xl"
               size="lg"
-              px="xl"
-              styles={{
-                root: {
-                  padding: '14px 32px',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  boxShadow: '0 6px 20px rgba(37, 99, 235, 0.25)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  minWidth: '160px',
-                  '&:hover': {
-                    transform: 'translateY(-3px)',
-                    boxShadow: '0 8px 25px rgba(37, 99, 235, 0.35)',
-                  }
-                }
-              }}
+              className="px-8 min-w-[160px] shadow-blue-500/25 border border-white/10"
             >
               Add User
             </Button>
-          </Flex>
+          </div>
 
-          <Box sx={{ position: 'relative', padding: '0 8px' }}>
-            <LoadingOverlay visible={loading} overlayBlur={2} />
-            <Table
-              striped
-              highlightOnHover
-              withBorder
-              withColumnBorders
-              sx={{
-                borderRadius: '20px',
-                overflow: 'hidden',
-                backgroundColor: '#ffffff',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                border: '1px solid rgba(0, 0, 0, 0.05)',
-                '& th': {
-                  backgroundColor: '#f8fafc',
-                  padding: '20px 28px',
-                  fontSize: '15px',
-                  fontWeight: 700,
-                  color: '#374151',
-                  borderBottom: '2px solid #e5e7eb',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  textAlign: 'left'
-                },
-                '& td': {
-                  padding: '20px 28px',
-                  borderBottom: '1px solid #f3f4f6',
-                  fontSize: '15px'
-                },
-                '& tbody tr:hover': {
-                  backgroundColor: '#f8fafc'
-                }
-              }}
-            >
-              <thead>
-                <tr>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th width={140}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((userItem) => (
-                  <tr key={userItem._id}>
-                    <td>
-                      <Text weight={700} size="md" sx={{ fontSize: '16px', color: '#1f2937' }}>
-                        {userItem.username}
-                      </Text>
-                    </td>
-                    <td>
-                      <Text color="dimmed" size="md" sx={{ fontSize: '15px', color: '#6b7280' }}>
-                        {userItem.email}
-                      </Text>
-                    </td>
-                    <td>
-                      <Badge
-                        color={userItem.role === 'administrator' ? 'red' : 'blue'}
-                        variant="filled"
-                        radius="xl"
-                        size="lg"
-                        styles={{
-                          root: {
-                            padding: '8px 16px',
-                            fontSize: '13px',
-                            fontWeight: 600,
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.5px'
-                          }
-                        }}
-                      >
-                        {userItem.role === 'administrator' ? 'ADMIN' : 'STAFF'}
-                      </Badge>
-                    </td>
-                    <td>
-                      <Group spacing="md">
-                        <ActionIcon
-                          color="blue"
-                          size="lg"
-                          variant="subtle"
-                          radius="xl"
-                          onClick={() => openEditModal(userItem)}
-                          disabled={!isAdmin && userItem.role === 'administrator'}
-                          styles={{
-                            root: {
-                              '&:hover': {
-                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                transform: 'scale(1.1)'
-                              }
-                            }
-                          }}
+          {/* Users Table */}
+          <div className="relative p-2">
+            {loading && (
+              <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm flex items-center justify-center z-50 rounded-2xl">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-brand-500 border-t-transparent"></div>
+              </div>
+            )}
+            <div className="rounded-2xl overflow-hidden bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700">
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableHeader>Username</TableHeader>
+                    <TableHeader>Email</TableHeader>
+                    <TableHeader>Role</TableHeader>
+                    <TableHeader>Actions</TableHeader>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {users.map((userItem) => (
+                    <TableRow key={userItem._id}>
+                      <TableData>
+                        <span className="font-bold text-base text-gray-900 dark:text-white">
+                          {userItem.username}
+                        </span>
+                      </TableData>
+                      <TableData>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {userItem.email}
+                        </span>
+                      </TableData>
+                      <TableData>
+                        <Badge
+                          color={userItem.role === 'administrator' ? 'red' : 'blue'}
+                          variant="filled"
+                          size="md"
+                          className="uppercase tracking-wide"
                         >
-                          <IconEdit size={18} />
-                        </ActionIcon>
-                        <ActionIcon
-                          color="red"
-                          size="lg"
-                          variant="subtle"
-                          radius="xl"
-                          onClick={() => openDeleteModal(userItem)}
-                          disabled={!isAdmin}
-                          styles={{
-                            root: {
-                              '&:hover': {
-                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                                transform: 'scale(1.1)'
-                              }
-                            }
-                          }}
-                        >
-                          <IconTrash size={18} />
-                        </ActionIcon>
-                      </Group>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Box>
+                          {userItem.role === 'administrator' ? 'ADMIN' : 'STAFF'}
+                        </Badge>
+                      </TableData>
+                      <TableData>
+                        <div className="flex items-center space-x-3">
+                          <button
+                            onClick={() => openEditModal(userItem)}
+                            disabled={!isAdmin && userItem.role === 'administrator'}
+                            className="w-9 h-9 flex items-center justify-center rounded-xl text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <IconEdit size={18} />
+                          </button>
+                          <button
+                            onClick={() => openDeleteModal(userItem)}
+                            disabled={!isAdmin}
+                            className="w-9 h-9 flex items-center justify-center rounded-xl text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <IconTrash size={18} />
+                          </button>
+                        </div>
+                      </TableData>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
 
           {/* Add User Modal */}
           <Modal
@@ -370,82 +281,45 @@ export default function Users() {
             onClose={closeModal}
             title="Add New User"
             size="md"
-            radius="xl"
-            styles={{
-              content: {
-                padding: '24px'
-              },
-              header: {
-                padding: '24px 24px 0'
-              },
-              body: {
-                padding: '24px'
-              }
-            }}
           >
-            <form onSubmit={handleAddUser}>
-              <Stack spacing="lg">
-                <TextInput
-                  label="Username"
-                  placeholder="Enter username"
-                  value={formData.username}
-                  onChange={(e) => setFormData({...formData, username: e.target.value})}
-                  required
-                  radius="md"
-                  size="md"
-                />
-                <TextInput
-                  label="Email"
-                  type="email"
-                  placeholder="Enter email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  required
-                  radius="md"
-                  size="md"
-                />
-                <PasswordInput
-                  label="Password"
-                  placeholder="Enter password (min 6 characters)"
-                  value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                  required
-                  radius="md"
-                  size="md"
-                />
-                <Select
-                  label="Role"
+            <form onSubmit={handleAddUser} className="space-y-6">
+              <Input
+                label="Username"
+                placeholder="Enter username"
+                value={formData.username}
+                onChange={(e) => setFormData({...formData, username: e.target.value})}
+                required
+              />
+              <Input
+                label="Email"
+                type="email"
+                placeholder="Enter email"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                required
+              />
+              <PasswordInput
+                label="Password"
+                placeholder="Enter password (min 6 characters)"
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                required
+              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Role</label>
+                <select
                   value={formData.role}
-                  onChange={(value) => setFormData({...formData, role: value})}
-                  data={[
-                    { value: 'staff', label: 'Staff' },
-                    ...(isAdmin ? [{ value: 'administrator', label: 'Administrator' }] : [])
-                  ]}
-                  radius="md"
-                  size="md"
-                />
-                <Group position="right" mt="xl">
-                  <Button
-                    variant="light"
-                    onClick={closeModal}
-                    radius="xl"
-                    size="md"
-                    px="xl"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="gradient"
-                    gradient={{ from: 'brand.5', to: 'brand.7' }}
-                    radius="xl"
-                    size="md"
-                    px="xl"
-                  >
-                    Add User
-                  </Button>
-                </Group>
-              </Stack>
+                  onChange={(e) => setFormData({...formData, role: e.target.value})}
+                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-900/50 transition-all duration-200"
+                >
+                  <option value="staff">Staff</option>
+                  {isAdmin && <option value="administrator">Administrator</option>}
+                </select>
+              </div>
+              <div className="flex justify-end space-x-3 mt-8">
+                <Button variant="light" color="gray" onClick={closeModal} size="md">Cancel</Button>
+                <Button type="submit" variant="gradient" color="brand" size="md">Add User</Button>
+              </div>
             </form>
           </Modal>
 
@@ -455,61 +329,45 @@ export default function Users() {
             onClose={closeModal}
             title="Edit User"
             size="md"
-            radius="xl"
-            styles={{
-              content: {
-                padding: '24px'
-              },
-              header: {
-                padding: '24px 24px 0'
-              },
-              body: {
-                padding: '24px'
-              }
-            }}
           >
             {editingUser && (
-              <form onSubmit={handleEditUser}>
-                <Stack spacing="md">
-                  <TextInput
-                    label="Username"
-                    value={editingUser.username}
-                    disabled
-                    placeholder="Username cannot be changed"
-                  />
-                  <TextInput
-                    label="Email"
-                    value={editingUser.email}
-                    disabled
-                    placeholder="Email cannot be changed"
-                  />
-                  <PasswordInput
-                    label="New Password (leave blank to keep current)"
-                    placeholder="Enter new password (min 6 characters)"
-                    value={editingUser.password}
-                    onChange={(e) => setEditingUser({...editingUser, password: e.target.value})}
-                  />
-                  {editingUser.role !== 'administrator' && (
-                    <Select
-                      label="Role"
+              <form onSubmit={handleEditUser} className="space-y-5">
+                <Input
+                  label="Username"
+                  value={editingUser.username}
+                  disabled
+                  className="opacity-60"
+                />
+                <Input
+                  label="Email"
+                  value={editingUser.email}
+                  disabled
+                  className="opacity-60"
+                />
+                <PasswordInput
+                  label="New Password (leave blank to keep current)"
+                  placeholder="Enter new password (min 6 characters)"
+                  value={editingUser.password}
+                  onChange={(e) => setEditingUser({...editingUser, password: e.target.value})}
+                />
+                {editingUser.role !== 'administrator' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Role</label>
+                    <select
                       value={editingUser.role}
-                      onChange={(value) => setEditingUser({...editingUser, role: value})}
+                      onChange={(e) => setEditingUser({...editingUser, role: e.target.value})}
                       disabled={!isAdmin}
-                      data={[
-                        { value: 'staff', label: 'Staff' },
-                        ...(isAdmin ? [{ value: 'administrator', label: 'Administrator' }] : [])
-                      ]}
-                    />
-                  )}
-                  <Group position="right" mt="md">
-                    <Button variant="light" onClick={closeModal}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" variant="gradient" gradient={{ from: 'brand.5', to: 'brand.7' }}>
-                      Update User
-                    </Button>
-                  </Group>
-                </Stack>
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-900/50 transition-all duration-200 disabled:opacity-60"
+                    >
+                      <option value="staff">Staff</option>
+                      {isAdmin && <option value="administrator">Administrator</option>}
+                    </select>
+                  </div>
+                )}
+                <div className="flex justify-end space-x-3 mt-6">
+                  <Button variant="light" color="gray" onClick={closeModal}>Cancel</Button>
+                  <Button type="submit" variant="gradient" color="brand">Update User</Button>
+                </div>
               </form>
             )}
           </Modal>
@@ -520,37 +378,21 @@ export default function Users() {
             onClose={closeModal}
             title="Delete User"
             size="md"
-            radius="xl"
-            styles={{
-              content: {
-                padding: '24px'
-              },
-              header: {
-                padding: '24px 24px 0'
-              },
-              body: {
-                padding: '24px'
-              }
-            }}
           >
             {deletingUser && (
-              <Stack spacing="md">
-                <Text>
+              <div className="space-y-5">
+                <p className="text-gray-700 dark:text-gray-300">
                   Are you sure you want to delete user "{deletingUser.username}"? This action cannot be undone.
-                </Text>
-                <Group position="right" mt="md">
-                  <Button variant="light" onClick={closeModal}>
-                    Cancel
-                  </Button>
-                  <Button color="red" onClick={handleDeleteUser}>
-                    Delete User
-                  </Button>
-                </Group>
-              </Stack>
+                </p>
+                <div className="flex justify-end space-x-3 mt-6">
+                  <Button variant="light" color="gray" onClick={closeModal}>Cancel</Button>
+                  <Button color="red" onClick={handleDeleteUser}>Delete User</Button>
+                </div>
+              </div>
             )}
           </Modal>
-        </Stack>
-      </Container>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
-} 
+}

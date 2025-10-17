@@ -1,17 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  Title,
-  Text,
-  Group,
-  Stack,
-  Button,
-  ActionIcon,
-  UnstyledButton,
-  Box,
-  Divider
-} from '@mantine/core';
-import {
   IconDashboard,
   IconUsers,
   IconWorld,
@@ -22,6 +11,7 @@ import {
 } from '@tabler/icons-react';
 import { useAuth } from '../services/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { Button } from './ui';
 
 export default function Sidebar() {
   const location = useLocation();
@@ -42,138 +32,75 @@ export default function Sidebar() {
   ];
 
   return (
-    <Box
-      style={{
-        width: 250,
-        position: 'fixed',
-        left: 0,
-        top: 0,
-        height: '100vh',
-        background: colorScheme === 'dark'
-          ? 'linear-gradient(180deg, #2c2e33 0%, #1a1b1e 100%)'
-          : 'linear-gradient(180deg, #2d3748 0%, #1a202c 100%)',
-        borderRight: 'none',
-        display: 'flex',
-        flexDirection: 'column',
-        padding: 16,
-        zIndex: 1000,
-        boxSizing: 'border-box',
-        overflow: 'hidden'
-      }}
-    >
-      <Box
-        p="md"
-        mb="md"
-        style={{
-          textAlign: 'center',
-          borderBottom: '1px solid rgba(255,255,255,0.1)'
-        }}
-      >
-        <Title
-          order={2}
-          size="h3"
-          style={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            color: 'white'
-          }}
-        >
+    <div className="fixed left-0 top-0 w-[250px] h-screen bg-gradient-sidebar flex flex-col p-4 z-[1000] overflow-hidden">
+      {/* Logo Section */}
+      <div className="p-4 mb-4 text-center border-b border-white/10">
+        <h2 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
           SparkleWP
-        </Title>
-      </Box>
+        </h2>
+      </div>
 
-      <Box style={{ flex: 1, overflow: 'hidden' }}>
-        <Stack spacing="xs">
-          {navItems.map((item) => (
-            <UnstyledButton
-              key={item.path}
-              component={Link}
-              to={item.path}
-              style={{
-                display: 'block',
-                width: '100%',
-                maxWidth: '218px',
-                padding: '12px 16px',
-                borderRadius: '8px',
-                textDecoration: 'none',
-                color: location.pathname === item.path ? 'white' : 'rgba(255,255,255,0.8)',
-                backgroundColor: location.pathname === item.path
-                  ? 'rgba(102, 126, 234, 0.8)'
-                  : 'transparent',
-                transition: 'all 0.2s',
-                borderLeft: location.pathname === item.path
-                  ? '3px solid #667eea'
-                  : '3px solid transparent',
-                overflow: 'hidden'
-              }}
-              styles={{
-                root: {
-                  '&:hover': {
-                    backgroundColor: location.pathname === item.path
-                      ? 'rgba(102, 126, 234, 0.9)'
-                      : 'rgba(255,255,255,0.1)'
+      {/* Navigation Section */}
+      <div className="flex-1 overflow-hidden">
+        <div className="flex flex-col space-y-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`
+                  flex items-center space-x-3 px-4 py-3 rounded-lg
+                  transition-all duration-200 no-underline
+                  max-w-[218px] overflow-hidden
+                  border-l-3
+                  ${isActive
+                    ? 'bg-brand-500/80 text-white border-l-brand-500'
+                    : 'bg-transparent text-white/80 border-l-transparent hover:bg-white/10'
                   }
-                }
-              }}
-            >
-              <Group spacing="sm" style={{ maxWidth: '100%', overflow: 'hidden' }}>
-                <item.icon size={18} style={{ flexShrink: 0 }} />
-                <Text size="sm" weight={500} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                `}
+              >
+                <Icon size={18} className="flex-shrink-0" />
+                <span className="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis">
                   {item.label}
-                </Text>
-              </Group>
-            </UnstyledButton>
-          ))}
-        </Stack>
-      </Box>
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
 
-      <Box>
-        <Divider mb="md" color="rgba(255,255,255,0.1)" />
+      {/* Bottom Section */}
+      <div>
+        <div className="h-px bg-white/10 mb-4" />
 
-        <Group position="apart" mb="md">
-          <Text size="sm" color="rgba(255,255,255,0.7)">
-            Theme
-          </Text>
-          <ActionIcon
+        {/* Theme Toggle */}
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-sm text-white/70">Theme</span>
+          <button
             onClick={toggleColorScheme}
-            size="lg"
-            variant="light"
-            style={{
-              backgroundColor: 'rgba(255,255,255,0.1)',
-              color: 'white'
-            }}
+            className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors"
           >
             {colorScheme === 'dark' ? <IconSun size={18} /> : <IconMoonStars size={18} />}
-          </ActionIcon>
-        </Group>
+          </button>
+        </div>
 
-        <Text size="sm" color="rgba(255,255,255,0.7)" mb="md">
+        {/* User Greeting */}
+        <p className="text-sm text-white/70 mb-4">
           Welcome back, {user?.username || 'Admin'}!
-        </Text>
+        </p>
 
-        <Button
-          leftIcon={<IconLogout size={16} />}
-          variant="light"
-          fullWidth
+        {/* Logout Button */}
+        <button
           onClick={handleLogout}
-          style={{
-            backgroundColor: 'rgba(255,255,255,0.1)',
-            color: 'white',
-            border: 'none'
-          }}
-          styles={{
-            root: {
-              '&:hover': {
-                backgroundColor: 'rgba(255,255,255,0.2)'
-              }
-            }
-          }}
+          className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors border-none font-medium text-sm"
         >
-          Logout
-        </Button>
-      </Box>
-    </Box>
+          <IconLogout size={16} />
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
   );
-} 
+}

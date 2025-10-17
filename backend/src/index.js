@@ -29,11 +29,20 @@ const PORT = process.env.PORT || 5000;
 
 async function startServer() {
   try {
-    // Start in-memory MongoDB server
-    const mongod = await MongoMemoryServer.create();
-    const mongoUri = mongod.getUri();
+    let mongoUri;
 
-    console.log('Starting in-memory MongoDB...');
+    // Check if using external MongoDB or in-memory
+    if (process.env.MONGO_URI && process.env.USE_REAL_MONGO === 'true') {
+      // Use real MongoDB (for Docker/production)
+      mongoUri = process.env.MONGO_URI;
+      console.log('Connecting to MongoDB at:', mongoUri.replace(/\/\/.*@/, '//<credentials>@')); // Hide credentials in logs
+    } else {
+      // Use in-memory MongoDB (for local development)
+      const mongod = await MongoMemoryServer.create();
+      mongoUri = mongod.getUri();
+      console.log('Starting in-memory MongoDB...');
+    }
+
     await mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
     console.log('MongoDB connected successfully');
 
@@ -41,6 +50,7 @@ async function startServer() {
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   } catch (err) {
     console.error('Server startup error:', err);
+    process.exit(1);
   }
 }
 

@@ -1,28 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Container,
-  Title,
-  Stack,
-  Group,
-  Button,
-  Text,
-  Card,
-  Badge,
-  LoadingOverlay,
-  Box,
-  Breadcrumbs,
-  Anchor,
-  Tabs,
-  ActionIcon,
-  Tooltip,
-  Alert,
-  Grid,
-  Paper,
-  Progress,
-  Divider
-} from '@mantine/core';
-import {
   IconChevronLeft,
   IconPlugConnected,
   IconPalette,
@@ -36,6 +14,7 @@ import {
   IconSettings,
   IconInfoCircle
 } from '@tabler/icons-react';
+import { Button, Badge } from '../components/ui';
 import api from '../services/api';
 
 export default function WebsiteSettings() {
@@ -126,731 +105,462 @@ export default function WebsiteSettings() {
 
   if (loading) {
     return (
-      <Box pos="relative" mih="400px">
-        <LoadingOverlay visible={true} />
-      </Box>
+      <div className="relative min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-brand-500 border-t-transparent"></div>
+      </div>
     );
   }
 
   if (!website) {
     return (
-      <Container size="lg" py="xl">
-        <Alert icon={<IconAlertCircle size="1rem" />} title="Website Not Found" color="red">
-          The website you're looking for doesn't exist or you don't have access to it.
-        </Alert>
-      </Container>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-start space-x-3 p-5 rounded-xl border bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
+            <IconAlertCircle size={20} className="text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="font-semibold text-red-800 dark:text-red-200 mb-1">Website Not Found</p>
+              <p className="text-sm text-red-700 dark:text-red-300">
+                The website you're looking for doesn't exist or you don't have access to it.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
   const pluginStats = getUpdateStats(websitePlugins);
   const themeStats = getUpdateStats(websiteThemes);
 
-  const breadcrumbItems = [
-    { title: 'Websites', href: '/websites' },
-    { title: website.name, href: null }
-  ].map((item, index) => (
-    item.href ? (
-      <Anchor key={index} onClick={() => navigate(item.href)} style={{ cursor: 'pointer' }}>
-        {item.title}
-      </Anchor>
-    ) : (
-      <Text key={index}>{item.title}</Text>
-    )
-  ));
-
   return (
-    <Box style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      padding: '32px 0 48px 0'
-    }}>
-      <Container size="xl" px="xl">
-        <Stack spacing="xl">
-          {/* Header */}
-          <Card
-            padding="xl"
-            radius="xl"
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.15)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}
-          >
-            <Group position="apart" align="flex-start">
-              <Stack spacing="sm">
-                <Group spacing="md">
-                  <ActionIcon
-                    size="xl"
-                    variant="light"
-                    color="white"
-                    onClick={() => navigate('/websites')}
-                    styles={{
-                      root: {
-                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                        '&:hover': {
-                          backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                          transform: 'scale(1.05)'
-                        },
-                        transition: 'all 0.2s ease'
-                      }
-                    }}
-                  >
-                    <IconChevronLeft size={24} />
-                  </ActionIcon>
-                  <Stack spacing="xs">
-                    <Group spacing="md" align="center">
-                      <Title order={1} style={{ color: 'white', fontSize: '2.25rem', fontWeight: 700, margin: 0 }}>
-                        {website.name}
-                      </Title>
-                      <Badge
-                        color={getStatusColor(website.status)}
-                        variant="filled"
-                        size="lg"
-                        radius="xl"
-                        style={{ textTransform: 'capitalize' }}
-                      >
-                        {website.status}
-                      </Badge>
-                    </Group>
-
-                    <Breadcrumbs
-                      separator="›"
-                      style={{ color: 'rgba(255, 255, 255, 0.8)' }}
-                      styles={{
-                        separator: { color: 'rgba(255, 255, 255, 0.6)' }
-                      }}
+    <div className="min-h-screen bg-gradient-primary py-8 pb-12">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="space-y-6">
+          {/* Header Card */}
+          <div className="bg-white/15 backdrop-blur-glass border border-white/20 rounded-2xl p-6 shadow-glass">
+            <div className="flex justify-between items-start">
+              <div className="flex items-start space-x-4">
+                <button
+                  onClick={() => navigate('/websites')}
+                  className="w-12 h-12 flex items-center justify-center rounded-xl bg-white/20 hover:bg-white/30 text-white transition-all duration-200 hover:scale-105"
+                >
+                  <IconChevronLeft size={24} />
+                </button>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-3">
+                    <h1 className="text-4xl font-bold text-white">
+                      {website.name}
+                    </h1>
+                    <Badge
+                      color={getStatusColor(website.status)}
+                      variant="filled"
+                      size="lg"
+                      className="capitalize"
                     >
-                      {breadcrumbItems}
-                    </Breadcrumbs>
+                      {website.status}
+                    </Badge>
+                  </div>
 
-                    <Text style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '1rem' }}>
-                      {website.url}
-                    </Text>
-                  </Stack>
-                </Group>
-              </Stack>
+                  <nav className="flex items-center space-x-2 text-white/80">
+                    <button
+                      onClick={() => navigate('/websites')}
+                      className="hover:text-white transition-colors"
+                    >
+                      Websites
+                    </button>
+                    <span className="text-white/60">›</span>
+                    <span className="text-white">{website.name}</span>
+                  </nav>
+
+                  <p className="text-white/90 text-base">
+                    {website.url}
+                  </p>
+                </div>
+              </div>
 
               <Button
                 leftIcon={<IconRefresh size={18} />}
-                variant="white"
-                loading={refreshing}
-                onClick={handleRefresh}
-                radius="xl"
+                variant="filled"
                 size="lg"
-                px="xl"
-                styles={{
-                  root: {
-                    fontWeight: 600,
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)'
-                    },
-                    transition: 'all 0.2s ease'
-                  }
-                }}
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="bg-white text-gray-900 hover:bg-white/90 px-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
               >
-                Refresh Data
+                {refreshing ? 'Refreshing...' : 'Refresh Data'}
               </Button>
-            </Group>
-          </Card>
+            </div>
+          </div>
 
-          {/* Alerts */}
+          {/* Alert Messages */}
           {error && (
-            <Alert icon={<IconAlertCircle size="1rem" />} title="Error" color="red" onClose={() => setError('')}>
-              {error}
-            </Alert>
+            <div className="flex items-start space-x-3 p-5 rounded-xl border bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
+              <IconAlertCircle size={20} className="text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="font-semibold text-red-800 dark:text-red-200 mb-1">Error</p>
+                <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+              </div>
+              <button
+                onClick={() => setError('')}
+                className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200"
+              >
+                <IconX size={18} />
+              </button>
+            </div>
           )}
 
           {success && (
-            <Alert icon={<IconCheck size="1rem" />} title="Success" color="green" onClose={() => setSuccess('')}>
-              {success}
-            </Alert>
+            <div className="flex items-start space-x-3 p-5 rounded-xl border bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+              <IconCheck size={20} className="text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="font-semibold text-green-800 dark:text-green-200 mb-1">Success</p>
+                <p className="text-sm text-green-700 dark:text-green-300">{success}</p>
+              </div>
+              <button
+                onClick={() => setSuccess('')}
+                className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200"
+              >
+                <IconX size={18} />
+              </button>
+            </div>
           )}
 
-          {/* Stats Overview */}
-          <Grid gutter="xl">
-            <Grid.Col span={4}>
-              <Paper
-                padding="xl"
-                radius="xl"
-                style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.98)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                  backdropFilter: 'blur(10px)'
-                }}
-              >
-                <Group position="apart" align="flex-start">
-                  <Stack spacing="sm">
-                    <Text size="sm" color="dimmed" weight={600} style={{ letterSpacing: '0.5px' }}>
-                      PLUGINS
-                    </Text>
-                    <Text size="2.5rem" weight={800} color="dark" style={{ lineHeight: 1, margin: '8px 0' }}>
-                      {pluginStats.total}
-                    </Text>
-                    <Text size="sm" color="dimmed" style={{ lineHeight: 1.4 }}>
-                      {pluginStats.active} active • {pluginStats.withUpdates} updates
-                    </Text>
-                  </Stack>
-                  <Box style={{
-                    padding: '12px',
-                    borderRadius: '12px',
-                    backgroundColor: 'rgba(99, 102, 241, 0.1)'
-                  }}>
-                    <IconPlugConnected size={28} style={{ color: '#6366f1' }} />
-                  </Box>
-                </Group>
-              </Paper>
-            </Grid.Col>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Plugins Stat */}
+            <div className="bg-white/98 backdrop-blur-glass border border-white/20 rounded-2xl p-6 shadow-lg">
+              <div className="flex justify-between items-start">
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wide">
+                    PLUGINS
+                  </p>
+                  <p className="text-5xl font-extrabold text-gray-900 dark:text-gray-100 leading-none my-2">
+                    {pluginStats.total}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {pluginStats.active} active • {pluginStats.withUpdates} updates
+                  </p>
+                </div>
+                <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-900/30">
+                  <IconPlugConnected size={28} className="text-indigo-600 dark:text-indigo-400" />
+                </div>
+              </div>
+            </div>
 
-            <Grid.Col span={4}>
-              <Paper
-                padding="xl"
-                radius="xl"
-                style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.98)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                  backdropFilter: 'blur(10px)'
-                }}
-              >
-                <Group position="apart" align="flex-start">
-                  <Stack spacing="sm">
-                    <Text size="sm" color="dimmed" weight={600} style={{ letterSpacing: '0.5px' }}>
-                      THEMES
-                    </Text>
-                    <Text size="2.5rem" weight={800} color="dark" style={{ lineHeight: 1, margin: '8px 0' }}>
-                      {themeStats.total}
-                    </Text>
-                    <Text size="sm" color="dimmed" style={{ lineHeight: 1.4 }}>
-                      {themeStats.active} active • {themeStats.withUpdates} updates
-                    </Text>
-                  </Stack>
-                  <Box style={{
-                    padding: '12px',
-                    borderRadius: '12px',
-                    backgroundColor: 'rgba(139, 92, 246, 0.1)'
-                  }}>
-                    <IconPalette size={28} style={{ color: '#8b5cf6' }} />
-                  </Box>
-                </Group>
-              </Paper>
-            </Grid.Col>
+            {/* Themes Stat */}
+            <div className="bg-white/98 backdrop-blur-glass border border-white/20 rounded-2xl p-6 shadow-lg">
+              <div className="flex justify-between items-start">
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wide">
+                    THEMES
+                  </p>
+                  <p className="text-5xl font-extrabold text-gray-900 dark:text-gray-100 leading-none my-2">
+                    {themeStats.total}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {themeStats.active} active • {themeStats.withUpdates} updates
+                  </p>
+                </div>
+                <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-purple-100 dark:bg-purple-900/30">
+                  <IconPalette size={28} className="text-purple-600 dark:text-purple-400" />
+                </div>
+              </div>
+            </div>
 
-            <Grid.Col span={4}>
-              <Paper
-                padding="xl"
-                radius="xl"
-                style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.98)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                  backdropFilter: 'blur(10px)'
-                }}
-              >
-                <Group position="apart" align="flex-start">
-                  <Stack spacing="sm">
-                    <Text size="sm" color="dimmed" weight={600} style={{ letterSpacing: '0.5px' }}>
-                      WORDPRESS
-                    </Text>
-                    <Text size="2.5rem" weight={800} color="dark" style={{ lineHeight: 1, margin: '8px 0' }}>
-                      {website.wpVersion || 'Unknown'}
-                    </Text>
-                    <Text size="sm" color="dimmed" style={{ lineHeight: 1.4 }}>
-                      Last sync: {website.lastSync ? new Date(website.lastSync).toLocaleDateString() : 'Never'}
-                    </Text>
-                  </Stack>
-                  <Box style={{
-                    padding: '12px',
-                    borderRadius: '12px',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)'
-                  }}>
-                    <IconInfoCircle size={28} style={{ color: '#10b981' }} />
-                  </Box>
-                </Group>
-              </Paper>
-            </Grid.Col>
-          </Grid>
+            {/* WordPress Stat */}
+            <div className="bg-white/98 backdrop-blur-glass border border-white/20 rounded-2xl p-6 shadow-lg">
+              <div className="flex justify-between items-start">
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wide">
+                    WORDPRESS
+                  </p>
+                  <p className="text-5xl font-extrabold text-gray-900 dark:text-gray-100 leading-none my-2">
+                    {website.wpVersion || 'Unknown'}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Last sync: {website.lastSync ? new Date(website.lastSync).toLocaleDateString() : 'Never'}
+                  </p>
+                </div>
+                <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-green-100 dark:bg-green-900/30">
+                  <IconInfoCircle size={28} className="text-green-600 dark:text-green-400" />
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Tab Navigation */}
-          <Card
-            padding="lg"
-            radius="xl"
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
-            }}
-          >
-            <Group spacing="lg" position="center">
-              <Button
-                variant={activeTab === 'plugins' ? 'filled' : 'light'}
+          <div className="bg-white/95 backdrop-blur-sm border border-white/30 rounded-2xl p-4 shadow-md">
+            <div className="flex justify-center items-center space-x-4">
+              <button
                 onClick={() => {
                   console.log('Switching to plugins tab');
                   setActiveTab('plugins');
                 }}
-                leftIcon={<IconPlugConnected size="1.1rem" />}
-                rightIcon={
-                  <Badge size="sm" variant={activeTab === 'plugins' ? 'light' : 'filled'} color="blue">
-                    {pluginStats.total}
-                  </Badge>
-                }
-                size="lg"
-                radius="xl"
-                px="xl"
-                styles={{
-                  root: {
-                    backgroundColor: activeTab === 'plugins'
-                      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                      : 'rgba(102, 126, 234, 0.1)',
-                    color: activeTab === 'plugins' ? 'white' : '#667eea',
-                    border: activeTab === 'plugins' ? 'none' : '2px solid rgba(102, 126, 234, 0.2)',
-                    fontWeight: 600,
-                    '&:hover': {
-                      backgroundColor: activeTab === 'plugins'
-                        ? 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)'
-                        : 'rgba(102, 126, 234, 0.15)',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)'
-                    },
-                    transition: 'all 0.2s ease'
-                  }
-                }}
+                className={`flex items-center space-x-3 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
+                  activeTab === 'plugins'
+                    ? 'bg-gradient-primary text-white shadow-lg hover:shadow-xl'
+                    : 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-2 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/30'
+                } hover:-translate-y-0.5`}
               >
-                Plugins
-              </Button>
-              <Button
-                variant={activeTab === 'themes' ? 'filled' : 'light'}
+                <IconPlugConnected size={20} />
+                <span>Plugins</span>
+                <Badge
+                  size="sm"
+                  variant={activeTab === 'plugins' ? 'light' : 'filled'}
+                  color="blue"
+                >
+                  {pluginStats.total}
+                </Badge>
+              </button>
+
+              <button
                 onClick={() => {
                   console.log('Switching to themes tab');
                   setActiveTab('themes');
                 }}
-                leftIcon={<IconPalette size="1.1rem" />}
-                rightIcon={
-                  <Badge size="sm" variant={activeTab === 'themes' ? 'light' : 'filled'} color="violet">
-                    {themeStats.total}
-                  </Badge>
-                }
-                size="lg"
-                radius="xl"
-                px="xl"
-                styles={{
-                  root: {
-                    backgroundColor: activeTab === 'themes'
-                      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                      : 'rgba(139, 92, 246, 0.1)',
-                    color: activeTab === 'themes' ? 'white' : '#8b5cf6',
-                    border: activeTab === 'themes' ? 'none' : '2px solid rgba(139, 92, 246, 0.2)',
-                    fontWeight: 600,
-                    '&:hover': {
-                      backgroundColor: activeTab === 'themes'
-                        ? 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)'
-                        : 'rgba(139, 92, 246, 0.15)',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 8px 25px rgba(139, 92, 246, 0.3)'
-                    },
-                    transition: 'all 0.2s ease'
-                  }
-                }}
+                className={`flex items-center space-x-3 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
+                  activeTab === 'themes'
+                    ? 'bg-gradient-primary text-white shadow-lg hover:shadow-xl'
+                    : 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/30'
+                } hover:-translate-y-0.5`}
               >
-                Themes
-              </Button>
-            </Group>
-          </Card>
+                <IconPalette size={20} />
+                <span>Themes</span>
+                <Badge
+                  size="sm"
+                  variant={activeTab === 'themes' ? 'light' : 'filled'}
+                  color="violet"
+                >
+                  {themeStats.total}
+                </Badge>
+              </button>
+            </div>
+          </div>
 
-          {/* Main Content */}
-          <Card
-            padding="2rem"
-            radius="xl"
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.98)',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-              backdropFilter: 'blur(10px)'
-            }}
-          >
-
+          {/* Main Content Card */}
+          <div className="bg-white/98 backdrop-blur-glass border border-white/30 rounded-2xl p-8 shadow-xl">
             {/* Plugins Content */}
             {activeTab === 'plugins' && (
-              <Stack spacing="xl">
-                <Group position="apart" align="center">
-                  <Title order={2} style={{ color: '#1f2937', fontWeight: 700, fontSize: '1.75rem' }}>
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
                     Installed Plugins
-                  </Title>
+                  </h2>
                   {pluginStats.withUpdates > 0 && (
                     <Button
                       variant="gradient"
-                      gradient={{ from: 'orange', to: 'red' }}
                       size="md"
-                      radius="xl"
-                      px="xl"
-                      styles={{
-                        root: {
-                          fontWeight: 600,
-                          '&:hover': {
-                            transform: 'translateY(-2px)',
-                            boxShadow: '0 8px 25px rgba(251, 146, 60, 0.4)'
-                          },
-                          transition: 'all 0.2s ease'
-                        }
-                      }}
+                      className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 px-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
                     >
                       {pluginStats.withUpdates} Updates Available
                     </Button>
                   )}
-                </Group>
+                </div>
 
                 {websitePlugins.length === 0 ? (
-                  <Alert
-                    icon={<IconInfoCircle size="1.2rem" />}
-                    color="blue"
-                    radius="xl"
-                    style={{
-                      padding: '1.5rem',
-                      backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                      border: '1px solid rgba(59, 130, 246, 0.2)'
-                    }}
-                  >
-                    No plugins data available. Make sure the SparkleWP Connector plugin is installed and active on your WordPress site.
-                  </Alert>
+                  <div className="flex items-start space-x-3 p-6 rounded-xl border bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+                    <IconInfoCircle size={24} className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                    <p className="text-blue-800 dark:text-blue-200">
+                      No plugins data available. Make sure the SparkleWP Connector plugin is installed and active on your WordPress site.
+                    </p>
+                  </div>
                 ) : (
-                  <Stack spacing="lg">
+                  <div className="space-y-4">
                     {websitePlugins.map((plugin, index) => (
-                      <Card
+                      <div
                         key={index}
-                        padding="xl"
-                        radius="xl"
-                        withBorder
-                        style={{
-                          border: '1px solid rgba(229, 231, 235, 0.8)',
-                          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                          '&:hover': {
-                            boxShadow: '0 8px 30px rgba(0, 0, 0, 0.12)',
-                            transform: 'translateY(-2px)'
-                          },
-                          transition: 'all 0.2s ease'
-                        }}
+                        className="border border-gray-200 dark:border-gray-700 rounded-2xl p-6 bg-white/80 dark:bg-gray-800/80 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200"
                       >
-                        <Group position="apart" align="flex-start">
-                          <Stack spacing="sm" style={{ flex: 1 }}>
-                            <Group spacing="sm" align="flex-start">
-                              <Stack spacing="xs" style={{ flex: 1 }}>
-                                <Group spacing="md" mb="sm">
-                                  <Text weight={700} size="xl" style={{ color: '#1f2937', fontSize: '1.25rem' }}>
-                                    {plugin.name}
-                                  </Text>
-                                  <Badge
-                                    color={plugin.active ? 'green' : 'gray'}
-                                    variant={plugin.active ? 'filled' : 'light'}
-                                    size="md"
-                                    radius="xl"
-                                    style={{ fontWeight: 600 }}
-                                  >
-                                    {plugin.active ? 'Active' : 'Inactive'}
-                                  </Badge>
-                                  {plugin.network_active && (
-                                    <Badge color="blue" variant="light" size="md" radius="xl">
-                                      Network Active
-                                    </Badge>
-                                  )}
-                                  {plugin.update_available && (
-                                    <Badge
-                                      color="orange"
-                                      variant="gradient"
-                                      gradient={{ from: 'orange', to: 'red' }}
-                                      size="md"
-                                      radius="xl"
-                                      style={{ fontWeight: 600 }}
-                                    >
-                                      Update Available
-                                    </Badge>
-                                  )}
-                                </Group>
-
-                                <Text size="md" color="dimmed" lineClamp={2} style={{ marginBottom: '12px', lineHeight: 1.5 }}>
-                                  {plugin.description || 'No description available.'}
-                                </Text>
-
-                                <Group spacing="xl">
-                                  <Text size="sm" color="dimmed" style={{ fontWeight: 500 }}>
-                                    Version: <strong style={{ color: '#374151' }}>{plugin.version}</strong>
-                                    {plugin.update_available && plugin.latest_version && (
-                                      <span style={{ color: '#f59e0b', fontWeight: 600 }}>
-                                        {' → '}<strong>{plugin.latest_version}</strong>
-                                      </span>
-                                    )}
-                                  </Text>
-                                  {plugin.author && (
-                                    <Text size="sm" color="dimmed" style={{ fontWeight: 500 }}>
-                                      Author: <strong style={{ color: '#374151' }}>{plugin.author}</strong>
-                                    </Text>
-                                  )}
-                                </Group>
-                              </Stack>
-                            </Group>
-                          </Stack>
-
-                          <Group spacing="md">
-                            {plugin.update_available && (
-                              <Tooltip label="Update plugin" position="top">
-                                <ActionIcon
-                                  color="orange"
-                                  variant="light"
-                                  size="xl"
-                                  radius="xl"
-                                  styles={{
-                                    root: {
-                                      '&:hover': {
-                                        backgroundColor: 'rgba(251, 146, 60, 0.2)',
-                                        transform: 'scale(1.1)'
-                                      },
-                                      transition: 'all 0.2s ease'
-                                    }
-                                  }}
-                                >
-                                  <IconDownload size={20} />
-                                </ActionIcon>
-                              </Tooltip>
-                            )}
-                            <Tooltip label="Plugin settings" position="top">
-                              <ActionIcon
-                                color="gray"
-                                variant="light"
-                                size="xl"
-                                radius="xl"
-                                styles={{
-                                  root: {
-                                    '&:hover': {
-                                      backgroundColor: 'rgba(107, 114, 128, 0.2)',
-                                      transform: 'scale(1.1)'
-                                    },
-                                    transition: 'all 0.2s ease'
-                                  }
-                                }}
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1 space-y-3">
+                            <div className="flex items-center space-x-3 flex-wrap gap-2">
+                              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                                {plugin.name}
+                              </h3>
+                              <Badge
+                                color={plugin.active ? 'green' : 'gray'}
+                                variant={plugin.active ? 'filled' : 'light'}
+                                size="md"
                               >
-                                <IconSettings size={20} />
-                              </ActionIcon>
-                            </Tooltip>
-                            {!plugin.active && (
-                              <Tooltip label="Delete plugin" position="top">
-                                <ActionIcon
-                                  color="red"
-                                  variant="light"
-                                  size="xl"
-                                  radius="xl"
-                                  styles={{
-                                    root: {
-                                      '&:hover': {
-                                        backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                                        transform: 'scale(1.1)'
-                                      },
-                                      transition: 'all 0.2s ease'
-                                    }
-                                  }}
+                                {plugin.active ? 'Active' : 'Inactive'}
+                              </Badge>
+                              {plugin.network_active && (
+                                <Badge color="blue" variant="light" size="md">
+                                  Network Active
+                                </Badge>
+                              )}
+                              {plugin.update_available && (
+                                <Badge
+                                  size="md"
+                                  className="bg-gradient-to-r from-orange-500 to-red-500 text-white"
                                 >
-                                  <IconTrash size={20} />
-                                </ActionIcon>
-                              </Tooltip>
+                                  Update Available
+                                </Badge>
+                              )}
+                            </div>
+
+                            <p className="text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2">
+                              {plugin.description || 'No description available.'}
+                            </p>
+
+                            <div className="flex items-center space-x-6">
+                              <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                                Version: <span className="font-bold text-gray-900 dark:text-gray-100">{plugin.version}</span>
+                                {plugin.update_available && plugin.latest_version && (
+                                  <span className="text-orange-600 dark:text-orange-400 font-semibold">
+                                    {' → '}<span className="font-bold">{plugin.latest_version}</span>
+                                  </span>
+                                )}
+                              </p>
+                              {plugin.author && (
+                                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                                  Author: <span className="font-bold text-gray-900 dark:text-gray-100">{plugin.author}</span>
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-2 ml-4">
+                            {plugin.update_available && (
+                              <button
+                                title="Update plugin"
+                                className="w-11 h-11 flex items-center justify-center rounded-xl text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-all hover:scale-110"
+                              >
+                                <IconDownload size={20} />
+                              </button>
                             )}
-                          </Group>
-                        </Group>
-                      </Card>
+                            <button
+                              title="Plugin settings"
+                              className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all hover:scale-110"
+                            >
+                              <IconSettings size={20} />
+                            </button>
+                            {!plugin.active && (
+                              <button
+                                title="Delete plugin"
+                                className="w-11 h-11 flex items-center justify-center rounded-xl text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 transition-all hover:scale-110"
+                              >
+                                <IconTrash size={20} />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     ))}
-                  </Stack>
+                  </div>
                 )}
-              </Stack>
+              </div>
             )}
 
             {/* Themes Content */}
             {activeTab === 'themes' && (
-              <Stack spacing="xl">
-                <Group position="apart" align="center">
-                  <Title order={2} style={{ color: '#1f2937', fontWeight: 700, fontSize: '1.75rem' }}>
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
                     Installed Themes
-                  </Title>
+                  </h2>
                   {themeStats.withUpdates > 0 && (
                     <Button
                       variant="gradient"
-                      gradient={{ from: 'orange', to: 'red' }}
                       size="md"
-                      radius="xl"
-                      px="xl"
-                      styles={{
-                        root: {
-                          fontWeight: 600,
-                          '&:hover': {
-                            transform: 'translateY(-2px)',
-                            boxShadow: '0 8px 25px rgba(251, 146, 60, 0.4)'
-                          },
-                          transition: 'all 0.2s ease'
-                        }
-                      }}
+                      className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 px-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
                     >
                       {themeStats.withUpdates} Updates Available
                     </Button>
                   )}
-                </Group>
+                </div>
 
                 {websiteThemes.length === 0 ? (
-                  <Alert
-                    icon={<IconInfoCircle size="1.2rem" />}
-                    color="blue"
-                    radius="xl"
-                    style={{
-                      padding: '1.5rem',
-                      backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                      border: '1px solid rgba(59, 130, 246, 0.2)'
-                    }}
-                  >
-                    No themes data available. Make sure the SparkleWP Connector plugin is installed and active on your WordPress site.
-                  </Alert>
+                  <div className="flex items-start space-x-3 p-6 rounded-xl border bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+                    <IconInfoCircle size={24} className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                    <p className="text-blue-800 dark:text-blue-200">
+                      No themes data available. Make sure the SparkleWP Connector plugin is installed and active on your WordPress site.
+                    </p>
+                  </div>
                 ) : (
-                  <Stack spacing="lg">
+                  <div className="space-y-4">
                     {websiteThemes.map((theme, index) => (
-                      <Card
+                      <div
                         key={index}
-                        padding="xl"
-                        radius="xl"
-                        withBorder
-                        style={{
-                          border: '1px solid rgba(229, 231, 235, 0.8)',
-                          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                          '&:hover': {
-                            boxShadow: '0 8px 30px rgba(0, 0, 0, 0.12)',
-                            transform: 'translateY(-2px)'
-                          },
-                          transition: 'all 0.2s ease'
-                        }}
+                        className="border border-gray-200 dark:border-gray-700 rounded-2xl p-6 bg-white/80 dark:bg-gray-800/80 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200"
                       >
-                        <Group position="apart" align="flex-start">
-                          <Stack spacing="sm" style={{ flex: 1 }}>
-                            <Group spacing="sm" align="flex-start">
-                              <Stack spacing="xs" style={{ flex: 1 }}>
-                                <Group spacing="md" mb="sm">
-                                  <Text weight={700} size="xl" style={{ color: '#1f2937', fontSize: '1.25rem' }}>
-                                    {theme.name}
-                                  </Text>
-                                  <Badge
-                                    color={theme.active ? 'green' : 'gray'}
-                                    variant={theme.active ? 'filled' : 'light'}
-                                    size="md"
-                                    radius="xl"
-                                    style={{ fontWeight: 600 }}
-                                  >
-                                    {theme.active ? 'Active' : 'Inactive'}
-                                  </Badge>
-                                  {theme.update_available && (
-                                    <Badge
-                                      color="orange"
-                                      variant="gradient"
-                                      gradient={{ from: 'orange', to: 'red' }}
-                                      size="md"
-                                      radius="xl"
-                                      style={{ fontWeight: 600 }}
-                                    >
-                                      Update Available
-                                    </Badge>
-                                  )}
-                                </Group>
-
-                                <Text size="md" color="dimmed" lineClamp={2} style={{ marginBottom: '12px', lineHeight: 1.5 }}>
-                                  {theme.description || 'No description available.'}
-                                </Text>
-
-                                <Group spacing="xl">
-                                  <Text size="sm" color="dimmed" style={{ fontWeight: 500 }}>
-                                    Version: <strong style={{ color: '#374151' }}>{theme.version}</strong>
-                                    {theme.update_available && theme.latest_version && (
-                                      <span style={{ color: '#f59e0b', fontWeight: 600 }}>
-                                        {' → '}<strong>{theme.latest_version}</strong>
-                                      </span>
-                                    )}
-                                  </Text>
-                                  {theme.author && (
-                                    <Text size="sm" color="dimmed" style={{ fontWeight: 500 }}>
-                                      Author: <strong style={{ color: '#374151' }}>{theme.author}</strong>
-                                    </Text>
-                                  )}
-                                </Group>
-                              </Stack>
-                            </Group>
-                          </Stack>
-
-                          <Group spacing="md">
-                            {theme.update_available && (
-                              <Tooltip label="Update theme" position="top">
-                                <ActionIcon
-                                  color="orange"
-                                  variant="light"
-                                  size="xl"
-                                  radius="xl"
-                                  styles={{
-                                    root: {
-                                      '&:hover': {
-                                        backgroundColor: 'rgba(251, 146, 60, 0.2)',
-                                        transform: 'scale(1.1)'
-                                      },
-                                      transition: 'all 0.2s ease'
-                                    }
-                                  }}
-                                >
-                                  <IconDownload size={20} />
-                                </ActionIcon>
-                              </Tooltip>
-                            )}
-                            <Tooltip label="Theme settings" position="top">
-                              <ActionIcon
-                                color="gray"
-                                variant="light"
-                                size="xl"
-                                radius="xl"
-                                styles={{
-                                  root: {
-                                    '&:hover': {
-                                      backgroundColor: 'rgba(107, 114, 128, 0.2)',
-                                      transform: 'scale(1.1)'
-                                    },
-                                    transition: 'all 0.2s ease'
-                                  }
-                                }}
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1 space-y-3">
+                            <div className="flex items-center space-x-3 flex-wrap gap-2">
+                              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                                {theme.name}
+                              </h3>
+                              <Badge
+                                color={theme.active ? 'green' : 'gray'}
+                                variant={theme.active ? 'filled' : 'light'}
+                                size="md"
                               >
-                                <IconSettings size={20} />
-                              </ActionIcon>
-                            </Tooltip>
-                            {!theme.active && (
-                              <Tooltip label="Delete theme" position="top">
-                                <ActionIcon
-                                  color="red"
-                                  variant="light"
-                                  size="xl"
-                                  radius="xl"
-                                  styles={{
-                                    root: {
-                                      '&:hover': {
-                                        backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                                        transform: 'scale(1.1)'
-                                      },
-                                      transition: 'all 0.2s ease'
-                                    }
-                                  }}
+                                {theme.active ? 'Active' : 'Inactive'}
+                              </Badge>
+                              {theme.update_available && (
+                                <Badge
+                                  size="md"
+                                  className="bg-gradient-to-r from-orange-500 to-red-500 text-white"
                                 >
-                                  <IconTrash size={20} />
-                                </ActionIcon>
-                              </Tooltip>
+                                  Update Available
+                                </Badge>
+                              )}
+                            </div>
+
+                            <p className="text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2">
+                              {theme.description || 'No description available.'}
+                            </p>
+
+                            <div className="flex items-center space-x-6">
+                              <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                                Version: <span className="font-bold text-gray-900 dark:text-gray-100">{theme.version}</span>
+                                {theme.update_available && theme.latest_version && (
+                                  <span className="text-orange-600 dark:text-orange-400 font-semibold">
+                                    {' → '}<span className="font-bold">{theme.latest_version}</span>
+                                  </span>
+                                )}
+                              </p>
+                              {theme.author && (
+                                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                                  Author: <span className="font-bold text-gray-900 dark:text-gray-100">{theme.author}</span>
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-2 ml-4">
+                            {theme.update_available && (
+                              <button
+                                title="Update theme"
+                                className="w-11 h-11 flex items-center justify-center rounded-xl text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-all hover:scale-110"
+                              >
+                                <IconDownload size={20} />
+                              </button>
                             )}
-                          </Group>
-                        </Group>
-                      </Card>
+                            <button
+                              title="Theme settings"
+                              className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all hover:scale-110"
+                            >
+                              <IconSettings size={20} />
+                            </button>
+                            {!theme.active && (
+                              <button
+                                title="Delete theme"
+                                className="w-11 h-11 flex items-center justify-center rounded-xl text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 transition-all hover:scale-110"
+                              >
+                                <IconTrash size={20} />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     ))}
-                  </Stack>
+                  </div>
                 )}
-              </Stack>
+              </div>
             )}
-          </Card>
-        </Stack>
-      </Container>
-    </Box>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
