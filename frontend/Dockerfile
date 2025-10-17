@@ -2,8 +2,8 @@
 FROM node:18-alpine as build
 WORKDIR /app
 
-# Accept build argument
-ARG REACT_APP_API_URL=/api
+# Accept build argument (empty for Docker, uses Nginx proxy)
+ARG REACT_APP_API_URL=
 
 # Set as environment variable for React build
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
