@@ -5,11 +5,10 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      pull_policy: always
       args:
         - REACT_APP_API_URL=/api
     image: sparklewp-frontend:latest
-    pull_policy: build
+    pull_policy: always
     container_name: sparklewp-frontend
     restart: unless-stopped
     ports:

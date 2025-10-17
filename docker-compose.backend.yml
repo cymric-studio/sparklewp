@@ -5,9 +5,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-      pull_policy: always
     image: sparklewp-backend:latest
-    pull_policy: build
+    pull_policy: always
     container_name: sparklewp-backend
     restart: unless-stopped
     ports:
