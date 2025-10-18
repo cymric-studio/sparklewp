@@ -33,15 +33,15 @@ module.exports = {
         },
       },
       backgroundImage: {
-        'gradient-primary': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        'gradient-primary': 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
         'gradient-sidebar': 'linear-gradient(180deg, #2c2e33 0%, #1a1b1e 100%)',
-        'gradient-blue': 'linear-gradient(135deg, #667eea 0%, #5082ff 100%)',
+        'gradient-blue': 'linear-gradient(135deg, #404040 0%, #1a1a1a 100%)',
       },
       boxShadow: {
-        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-        'elevation': '0 20px 40px rgba(0, 0, 0, 0.15)',
-        'hover': '0 6px 16px rgba(102, 126, 234, 0.4)',
-        'card': '0 4px 12px rgba(102, 126, 234, 0.3)',
+        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.2)',
+        'elevation': '0 20px 40px rgba(0, 0, 0, 0.25)',
+        'hover': '0 6px 16px rgba(0, 0, 0, 0.3)',
+        'card': '0 4px 12px rgba(0, 0, 0, 0.15)',
       },
       backdropBlur: {
         'glass': '10px',
