@@ -889,6 +889,316 @@ class WordPressApiClient {
       };
     }
   }
+
+  async updatePlugin(slug) {
+    const { method, username, password } = this.connectionData;
+
+    if (!username || !password) {
+      throw new Error('Authentication required');
+    }
+
+    try {
+      const cleanPassword = password.replace(/\s+/g, '').trim();
+      const credentials = Buffer.from(`${username}:${cleanPassword}`).toString('base64');
+      const authHeaders = {
+        'Authorization': `Basic ${credentials}`,
+        'User-Agent': 'SparkleWP/1.0',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      };
+
+      console.log(`Updating plugin ${slug} on ${this.siteUrl}...`);
+
+      // Try SparkleWP Connector plugin endpoint first
+      try {
+        console.log('Trying SparkleWP Connector plugin update endpoint...');
+        const connectorResponse = await axios.post(
+          `${this.siteUrl}/wp-json/sparklewp/v1/plugin/update`,
+          { slug: slug },
+          {
+            headers: authHeaders,
+            timeout: 30000, // Plugin updates may take longer
+            validateStatus: (status) => status < 500
+          }
+        );
+
+        if (connectorResponse.status === 200 && connectorResponse.data && connectorResponse.data.success) {
+          console.log(`Plugin ${slug} updated successfully via SparkleWP Connector`);
+          return connectorResponse.data;
+        }
+      } catch (connectorError) {
+        console.log('SparkleWP Connector update endpoint not available:', connectorError.message);
+      }
+
+      // Fallback: WordPress doesn't have a native REST API endpoint for updating plugins
+      // This would require WP-CLI or a custom implementation
+      throw new Error('Plugin updates require the SparkleWP Connector plugin to be installed and activated on the WordPress site');
+
+    } catch (error) {
+      console.error('Failed to update plugin:', error.message);
+      if (error.response) {
+        console.log(`HTTP Error: ${error.response.status} - ${error.response.statusText}`);
+        console.log('Response data:', error.response.data);
+      }
+      throw error;
+    }
+  }
+
+  async activatePlugin(slug) {
+    const { method, username, password } = this.connectionData;
+
+    if (!username || !password) {
+      throw new Error('Authentication required');
+    }
+
+    try {
+      const cleanPassword = password.replace(/\s+/g, '').trim();
+      const credentials = Buffer.from(`${username}:${cleanPassword}`).toString('base64');
+      const authHeaders = {
+        'Authorization': `Basic ${credentials}`,
+        'User-Agent': 'SparkleWP/1.0',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      };
+
+      console.log(`Activating plugin ${slug} on ${this.siteUrl}...`);
+
+      // Try SparkleWP Connector plugin endpoint first
+      try {
+        console.log('Trying SparkleWP Connector plugin activate endpoint...');
+        const connectorResponse = await axios.post(
+          `${this.siteUrl}/wp-json/sparklewp/v1/plugin/activate`,
+          { slug: slug },
+          {
+            headers: authHeaders,
+            timeout: this.timeout,
+            validateStatus: (status) => status < 500
+          }
+        );
+
+        if (connectorResponse.status === 200 && connectorResponse.data && connectorResponse.data.success) {
+          console.log(`Plugin ${slug} activated successfully via SparkleWP Connector`);
+          return connectorResponse.data;
+        }
+      } catch (connectorError) {
+        console.log('SparkleWP Connector activate endpoint not available:', connectorError.message);
+      }
+
+      // Fallback to WordPress REST API (WordPress 5.5+)
+      try {
+        console.log('Trying WordPress REST API for plugin activation...');
+        const response = await axios.put(
+          `${this.siteUrl}/wp-json/wp/v2/plugins/${encodeURIComponent(slug)}`,
+          { status: 'active' },
+          {
+            headers: authHeaders,
+            timeout: this.timeout,
+            validateStatus: (status) => status < 500
+          }
+        );
+
+        if (response.status === 200) {
+          console.log(`Plugin ${slug} activated successfully via WordPress REST API`);
+          return response.data;
+        } else {
+          throw new Error(`Failed to activate plugin: HTTP ${response.status}`);
+        }
+      } catch (apiError) {
+        console.log('WordPress REST API plugin activation failed:', apiError.message);
+        throw new Error('Plugin activation failed. Ensure the plugin exists and you have sufficient permissions.');
+      }
+
+    } catch (error) {
+      console.error('Failed to activate plugin:', error.message);
+      if (error.response) {
+        console.log(`HTTP Error: ${error.response.status} - ${error.response.statusText}`);
+        console.log('Response data:', error.response.data);
+      }
+      throw error;
+    }
+  }
+
+  async deactivatePlugin(slug) {
+    const { method, username, password } = this.connectionData;
+
+    if (!username || !password) {
+      throw new Error('Authentication required');
+    }
+
+    try {
+      const cleanPassword = password.replace(/\s+/g, '').trim();
+      const credentials = Buffer.from(`${username}:${cleanPassword}`).toString('base64');
+      const authHeaders = {
+        'Authorization': `Basic ${credentials}`,
+        'User-Agent': 'SparkleWP/1.0',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      };
+
+      console.log(`Deactivating plugin ${slug} on ${this.siteUrl}...`);
+
+      // Try SparkleWP Connector plugin endpoint first
+      try {
+        console.log('Trying SparkleWP Connector plugin deactivate endpoint...');
+        const connectorResponse = await axios.post(
+          `${this.siteUrl}/wp-json/sparklewp/v1/plugin/deactivate`,
+          { slug: slug },
+          {
+            headers: authHeaders,
+            timeout: this.timeout,
+            validateStatus: (status) => status < 500
+          }
+        );
+
+        if (connectorResponse.status === 200 && connectorResponse.data && connectorResponse.data.success) {
+          console.log(`Plugin ${slug} deactivated successfully via SparkleWP Connector`);
+          return connectorResponse.data;
+        }
+      } catch (connectorError) {
+        console.log('SparkleWP Connector deactivate endpoint not available:', connectorError.message);
+      }
+
+      // Fallback to WordPress REST API (WordPress 5.5+)
+      try {
+        console.log('Trying WordPress REST API for plugin deactivation...');
+        const response = await axios.put(
+          `${this.siteUrl}/wp-json/wp/v2/plugins/${encodeURIComponent(slug)}`,
+          { status: 'inactive' },
+          {
+            headers: authHeaders,
+            timeout: this.timeout,
+            validateStatus: (status) => status < 500
+          }
+        );
+
+        if (response.status === 200) {
+          console.log(`Plugin ${slug} deactivated successfully via WordPress REST API`);
+          return response.data;
+        } else {
+          throw new Error(`Failed to deactivate plugin: HTTP ${response.status}`);
+        }
+      } catch (apiError) {
+        console.log('WordPress REST API plugin deactivation failed:', apiError.message);
+        throw new Error('Plugin deactivation failed. Ensure the plugin exists and you have sufficient permissions.');
+      }
+
+    } catch (error) {
+      console.error('Failed to deactivate plugin:', error.message);
+      if (error.response) {
+        console.log(`HTTP Error: ${error.response.status} - ${error.response.statusText}`);
+        console.log('Response data:', error.response.data);
+      }
+      throw error;
+    }
+  }
+
+  async updateTheme(slug) {
+    const { method, username, password } = this.connectionData;
+
+    if (!username || !password) {
+      throw new Error('Authentication required');
+    }
+
+    try {
+      const cleanPassword = password.replace(/\s+/g, '').trim();
+      const credentials = Buffer.from(`${username}:${cleanPassword}`).toString('base64');
+      const authHeaders = {
+        'Authorization': `Basic ${credentials}`,
+        'User-Agent': 'SparkleWP/1.0',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      };
+
+      console.log(`Updating theme ${slug} on ${this.siteUrl}...`);
+
+      // Try SparkleWP Connector plugin endpoint first
+      try {
+        console.log('Trying SparkleWP Connector theme update endpoint...');
+        const connectorResponse = await axios.post(
+          `${this.siteUrl}/wp-json/sparklewp/v1/theme/update`,
+          { slug: slug },
+          {
+            headers: authHeaders,
+            timeout: 30000, // Theme updates may take longer
+            validateStatus: (status) => status < 500
+          }
+        );
+
+        if (connectorResponse.status === 200 && connectorResponse.data && connectorResponse.data.success) {
+          console.log(`Theme ${slug} updated successfully via SparkleWP Connector`);
+          return connectorResponse.data;
+        }
+      } catch (connectorError) {
+        console.log('SparkleWP Connector theme update endpoint not available:', connectorError.message);
+      }
+
+      // Fallback: WordPress doesn't have a native REST API endpoint for updating themes
+      throw new Error('Theme updates require the SparkleWP Connector plugin to be installed and activated on the WordPress site');
+
+    } catch (error) {
+      console.error('Failed to update theme:', error.message);
+      if (error.response) {
+        console.log(`HTTP Error: ${error.response.status} - ${error.response.statusText}`);
+        console.log('Response data:', error.response.data);
+      }
+      throw error;
+    }
+  }
+
+  async activateTheme(slug) {
+    const { method, username, password } = this.connectionData;
+
+    if (!username || !password) {
+      throw new Error('Authentication required');
+    }
+
+    try {
+      const cleanPassword = password.replace(/\s+/g, '').trim();
+      const credentials = Buffer.from(`${username}:${cleanPassword}`).toString('base64');
+      const authHeaders = {
+        'Authorization': `Basic ${credentials}`,
+        'User-Agent': 'SparkleWP/1.0',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      };
+
+      console.log(`Activating theme ${slug} on ${this.siteUrl}...`);
+
+      // Try SparkleWP Connector plugin endpoint first
+      try {
+        console.log('Trying SparkleWP Connector theme activate endpoint...');
+        const connectorResponse = await axios.post(
+          `${this.siteUrl}/wp-json/sparklewp/v1/theme/activate`,
+          { slug: slug },
+          {
+            headers: authHeaders,
+            timeout: this.timeout,
+            validateStatus: (status) => status < 500
+          }
+        );
+
+        if (connectorResponse.status === 200 && connectorResponse.data && connectorResponse.data.success) {
+          console.log(`Theme ${slug} activated successfully via SparkleWP Connector`);
+          return connectorResponse.data;
+        }
+      } catch (connectorError) {
+        console.log('SparkleWP Connector theme activate endpoint not available:', connectorError.message);
+      }
+
+      // Fallback: Try WordPress REST API (limited support)
+      // Note: WordPress core doesn't have a direct theme activation endpoint in REST API
+      // This would typically require a custom implementation or plugin
+      throw new Error('Theme activation requires the SparkleWP Connector plugin to be installed and activated on the WordPress site');
+
+    } catch (error) {
+      console.error('Failed to activate theme:', error.message);
+      if (error.response) {
+        console.log(`HTTP Error: ${error.response.status} - ${error.response.statusText}`);
+        console.log('Response data:', error.response.data);
+      }
+      throw error;
+    }
+  }
 }
 
 module.exports = WordPressApiClient;

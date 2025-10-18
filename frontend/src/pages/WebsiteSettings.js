@@ -11,8 +11,9 @@ import {
   IconX,
   IconDownload,
   IconTrash,
-  IconSettings,
-  IconInfoCircle
+  IconInfoCircle,
+  IconPlayerPlay,
+  IconPlayerPause
 } from '@tabler/icons-react';
 import { Button, Badge } from '../components/ui';
 import api from '../services/api';
@@ -28,6 +29,7 @@ export default function WebsiteSettings() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [activeTab, setActiveTab] = useState('plugins');
+  const [actionLoading, setActionLoading] = useState({});
 
   const token = localStorage.getItem('token');
 
@@ -83,6 +85,83 @@ export default function WebsiteSettings() {
       setError(err.response?.data?.message || 'Failed to refresh website data');
     } finally {
       setRefreshing(false);
+    }
+  };
+
+  const handlePluginUpdate = async (pluginSlug, pluginName) => {
+    const key = `plugin-update-${pluginSlug}`;
+    setActionLoading(prev => ({ ...prev, [key]: true }));
+    setError('');
+    setSuccess('');
+
+    try {
+      await api.post(`/api/websites/${id}/plugins/${pluginSlug}/update`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSuccess(`Successfully updated ${pluginName}`);
+      await fetchWebsiteDetails();
+    } catch (err) {
+      setError(err.response?.data?.message || `Failed to update ${pluginName}`);
+    } finally {
+      setActionLoading(prev => ({ ...prev, [key]: false }));
+    }
+  };
+
+  const handlePluginToggle = async (pluginSlug, pluginName, currentStatus) => {
+    const key = `plugin-toggle-${pluginSlug}`;
+    setActionLoading(prev => ({ ...prev, [key]: true }));
+    setError('');
+    setSuccess('');
+
+    try {
+      const action = currentStatus ? 'deactivate' : 'activate';
+      await api.post(`/api/websites/${id}/plugins/${pluginSlug}/${action}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSuccess(`Successfully ${action}d ${pluginName}`);
+      await fetchWebsiteDetails();
+    } catch (err) {
+      setError(err.response?.data?.message || `Failed to ${currentStatus ? 'deactivate' : 'activate'} ${pluginName}`);
+    } finally {
+      setActionLoading(prev => ({ ...prev, [key]: false }));
+    }
+  };
+
+  const handleThemeUpdate = async (themeSlug, themeName) => {
+    const key = `theme-update-${themeSlug}`;
+    setActionLoading(prev => ({ ...prev, [key]: true }));
+    setError('');
+    setSuccess('');
+
+    try {
+      await api.post(`/api/websites/${id}/themes/${themeSlug}/update`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSuccess(`Successfully updated ${themeName}`);
+      await fetchWebsiteDetails();
+    } catch (err) {
+      setError(err.response?.data?.message || `Failed to update ${themeName}`);
+    } finally {
+      setActionLoading(prev => ({ ...prev, [key]: false }));
+    }
+  };
+
+  const handleThemeActivate = async (themeSlug, themeName) => {
+    const key = `theme-activate-${themeSlug}`;
+    setActionLoading(prev => ({ ...prev, [key]: true }));
+    setError('');
+    setSuccess('');
+
+    try {
+      await api.post(`/api/websites/${id}/themes/${themeSlug}/activate`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSuccess(`Successfully activated ${themeName}`);
+      await fetchWebsiteDetails();
+    } catch (err) {
+      setError(err.response?.data?.message || `Failed to activate ${themeName}`);
+    } finally {
+      setActionLoading(prev => ({ ...prev, [key]: false }));
     }
   };
 
@@ -423,25 +502,31 @@ export default function WebsiteSettings() {
                             {plugin.update_available && (
                               <button
                                 title="Update plugin"
-                                className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/20 hover:bg-gray-100 dark:hover:bg-gray-900/30 transition-all hover:scale-110"
+                                onClick={() => handlePluginUpdate(plugin.slug, plugin.name)}
+                                disabled={actionLoading[`plugin-update-${plugin.slug}`]}
+                                className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/20 hover:bg-gray-100 dark:hover:bg-gray-900/30 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
-                                <IconDownload size={20} />
+                                {actionLoading[`plugin-update-${plugin.slug}`] ? (
+                                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-600 border-t-transparent"></div>
+                                ) : (
+                                  <IconDownload size={20} />
+                                )}
                               </button>
                             )}
                             <button
-                              title="Plugin settings"
-                              className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all hover:scale-110"
+                              title={plugin.active ? "Deactivate plugin" : "Activate plugin"}
+                              onClick={() => handlePluginToggle(plugin.slug, plugin.name, plugin.active)}
+                              disabled={actionLoading[`plugin-toggle-${plugin.slug}`]}
+                              className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              <IconSettings size={20} />
+                              {actionLoading[`plugin-toggle-${plugin.slug}`] ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-600 border-t-transparent"></div>
+                              ) : plugin.active ? (
+                                <IconPlayerPause size={20} />
+                              ) : (
+                                <IconPlayerPlay size={20} />
+                              )}
                             </button>
-                            {!plugin.active && (
-                              <button
-                                title="Delete plugin"
-                                className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/20 hover:bg-gray-100 dark:hover:bg-gray-900/30 transition-all hover:scale-110"
-                              >
-                                <IconTrash size={20} />
-                              </button>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -531,23 +616,29 @@ export default function WebsiteSettings() {
                             {theme.update_available && (
                               <button
                                 title="Update theme"
-                                className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/20 hover:bg-gray-100 dark:hover:bg-gray-900/30 transition-all hover:scale-110"
+                                onClick={() => handleThemeUpdate(theme.slug, theme.name)}
+                                disabled={actionLoading[`theme-update-${theme.slug}`]}
+                                className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/20 hover:bg-gray-100 dark:hover:bg-gray-900/30 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
-                                <IconDownload size={20} />
+                                {actionLoading[`theme-update-${theme.slug}`] ? (
+                                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-600 border-t-transparent"></div>
+                                ) : (
+                                  <IconDownload size={20} />
+                                )}
                               </button>
                             )}
-                            <button
-                              title="Theme settings"
-                              className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all hover:scale-110"
-                            >
-                              <IconSettings size={20} />
-                            </button>
                             {!theme.active && (
                               <button
-                                title="Delete theme"
-                                className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/20 hover:bg-gray-100 dark:hover:bg-gray-900/30 transition-all hover:scale-110"
+                                title="Activate theme"
+                                onClick={() => handleThemeActivate(theme.slug, theme.name)}
+                                disabled={actionLoading[`theme-activate-${theme.slug}`]}
+                                className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
-                                <IconTrash size={20} />
+                                {actionLoading[`theme-activate-${theme.slug}`] ? (
+                                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-600 border-t-transparent"></div>
+                                ) : (
+                                  <IconPlayerPlay size={20} />
+                                )}
                               </button>
                             )}
                           </div>

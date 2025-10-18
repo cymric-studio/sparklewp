@@ -315,6 +315,136 @@ router.post('/:id/test', auth, async (req, res) => {
   }
 });
 
+// Update plugin
+router.post('/:id/plugins/:slug/update', auth, async (req, res) => {
+  try {
+    const website = await Website.findById(req.params.id);
+    if (!website) {
+      return res.status(404).json({ message: 'Website not found' });
+    }
+
+    if (website.status !== 'connected' || !website.connectionData) {
+      return res.status(400).json({ message: 'Website is not connected' });
+    }
+
+    const wpClient = new WordPressApiClient(website.url, {
+      method: website.connectionMethod,
+      username: website.connectionData.username,
+      password: website.connectionData.encryptedPassword,
+      apiKey: website.connectionData.apiKey
+    });
+
+    await wpClient.updatePlugin(req.params.slug);
+    res.json({ message: 'Plugin updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update plugin', error: error.message });
+  }
+});
+
+// Activate plugin
+router.post('/:id/plugins/:slug/activate', auth, async (req, res) => {
+  try {
+    const website = await Website.findById(req.params.id);
+    if (!website) {
+      return res.status(404).json({ message: 'Website not found' });
+    }
+
+    if (website.status !== 'connected' || !website.connectionData) {
+      return res.status(400).json({ message: 'Website is not connected' });
+    }
+
+    const wpClient = new WordPressApiClient(website.url, {
+      method: website.connectionMethod,
+      username: website.connectionData.username,
+      password: website.connectionData.encryptedPassword,
+      apiKey: website.connectionData.apiKey
+    });
+
+    await wpClient.activatePlugin(req.params.slug);
+    res.json({ message: 'Plugin activated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to activate plugin', error: error.message });
+  }
+});
+
+// Deactivate plugin
+router.post('/:id/plugins/:slug/deactivate', auth, async (req, res) => {
+  try {
+    const website = await Website.findById(req.params.id);
+    if (!website) {
+      return res.status(404).json({ message: 'Website not found' });
+    }
+
+    if (website.status !== 'connected' || !website.connectionData) {
+      return res.status(400).json({ message: 'Website is not connected' });
+    }
+
+    const wpClient = new WordPressApiClient(website.url, {
+      method: website.connectionMethod,
+      username: website.connectionData.username,
+      password: website.connectionData.encryptedPassword,
+      apiKey: website.connectionData.apiKey
+    });
+
+    await wpClient.deactivatePlugin(req.params.slug);
+    res.json({ message: 'Plugin deactivated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to deactivate plugin', error: error.message });
+  }
+});
+
+// Update theme
+router.post('/:id/themes/:slug/update', auth, async (req, res) => {
+  try {
+    const website = await Website.findById(req.params.id);
+    if (!website) {
+      return res.status(404).json({ message: 'Website not found' });
+    }
+
+    if (website.status !== 'connected' || !website.connectionData) {
+      return res.status(400).json({ message: 'Website is not connected' });
+    }
+
+    const wpClient = new WordPressApiClient(website.url, {
+      method: website.connectionMethod,
+      username: website.connectionData.username,
+      password: website.connectionData.encryptedPassword,
+      apiKey: website.connectionData.apiKey
+    });
+
+    await wpClient.updateTheme(req.params.slug);
+    res.json({ message: 'Theme updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update theme', error: error.message });
+  }
+});
+
+// Activate theme
+router.post('/:id/themes/:slug/activate', auth, async (req, res) => {
+  try {
+    const website = await Website.findById(req.params.id);
+    if (!website) {
+      return res.status(404).json({ message: 'Website not found' });
+    }
+
+    if (website.status !== 'connected' || !website.connectionData) {
+      return res.status(400).json({ message: 'Website is not connected' });
+    }
+
+    const wpClient = new WordPressApiClient(website.url, {
+      method: website.connectionMethod,
+      username: website.connectionData.username,
+      password: website.connectionData.encryptedPassword,
+      apiKey: website.connectionData.apiKey
+    });
+
+    await wpClient.activateTheme(req.params.slug);
+    res.json({ message: 'Theme activated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to activate theme', error: error.message });
+  }
+});
+
 // Delete website
 router.delete('/:id', auth, async (req, res) => {
   try {
