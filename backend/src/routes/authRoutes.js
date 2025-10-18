@@ -12,6 +12,12 @@ const loginLimiter = rateLimit({
   message: { message: 'Too many login attempts, please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
+  // Skip failed requests to avoid blocking legitimate users due to proxy issues
+  skipFailedRequests: true,
+  // Trust proxy headers when behind reverse proxy (Dokploy, nginx, etc)
+  validate: {
+    xForwardedForHeader: false, // Disable validation for X-Forwarded-For
+  }
 });
 
 // Input validation middleware
