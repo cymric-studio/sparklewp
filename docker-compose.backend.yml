@@ -13,7 +13,7 @@ services:
       - NODE_ENV=production
       - PORT=5000
       - USE_REAL_MONGO=true
-      - MONGO_URI=mongodb://${MONGO_USERNAME:-sparklewp_admin}:${MONGO_PASSWORD}@sparklewp-mongodb:27017/sparkle?authSource=admin
+      - MONGO_URI=${MONGO_URI}
       - JWT_SECRET=${JWT_SECRET}
       - CLIENT_URL=${CLIENT_URL}
     networks:
