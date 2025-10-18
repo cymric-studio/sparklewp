@@ -20,33 +20,33 @@ export default function Dashboard() {
       title: 'Total Sites',
       value: '5',
       icon: IconWorld,
-      color: 'blue',
-      bgColor: 'bg-blue-600',
-      shadowColor: 'shadow-blue-600/30'
+      color: 'gray-900',
+      bgColor: 'bg-gray-900',
+      shadowColor: 'shadow-black/20'
     },
     {
       title: 'Active Users',
       value: '12',
       icon: IconUsers,
-      color: 'green',
-      bgColor: 'bg-green-600',
-      shadowColor: 'shadow-green-600/30'
+      color: 'gray-800',
+      bgColor: 'bg-gray-800',
+      shadowColor: 'shadow-black/20'
     },
     {
       title: 'Updates Available',
       value: '3',
       icon: IconChartBar,
-      color: 'orange',
-      bgColor: 'bg-orange-600',
-      shadowColor: 'shadow-orange-600/30'
+      color: 'gray-700',
+      bgColor: 'bg-gray-700',
+      shadowColor: 'shadow-black/20'
     },
     {
       title: 'Security Score',
       value: '98%',
       icon: IconShield,
-      color: 'teal',
-      bgColor: 'bg-teal-600',
-      shadowColor: 'shadow-teal-600/30'
+      color: 'gray-600',
+      bgColor: 'bg-gray-600',
+      shadowColor: 'shadow-black/20'
     }
   ];
 
@@ -75,7 +75,7 @@ export default function Dashboard() {
           <Card
             shadow="xl"
             padding="lg"
-            className="bg-[#2C5F7C] border-0"
+            className="bg-gradient-primary border-0"
           >
             <div className="py-2">
               <h2 className="text-2xl font-bold text-white mb-2">
@@ -91,10 +91,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
             {statsData.map((stat, index) => {
               const Icon = stat.icon;
-              const textColor = stat.color === 'blue' ? 'text-blue-600 dark:text-blue-500' :
-                               stat.color === 'green' ? 'text-green-600 dark:text-green-500' :
-                               stat.color === 'orange' ? 'text-orange-600 dark:text-orange-500' :
-                               'text-teal-600 dark:text-teal-500';
+              const textColor = `text-${stat.color} dark:text-gray-100`;
 
               return (
                 <Card
@@ -141,7 +138,7 @@ export default function Dashboard() {
                     variant="filled"
                     size="lg"
                     fullWidth
-                    className="bg-[#2C5F7C] hover:bg-[#244d63] shadow-card hover:shadow-hover hover:-translate-y-0.5 transition-all duration-200"
+                    className="shadow-card hover:shadow-hover hover:-translate-y-0.5 transition-all duration-200"
                   >
                     {action.label}
                   </Button>
