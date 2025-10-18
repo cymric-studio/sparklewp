@@ -17,9 +17,9 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - CLIENT_URL=${CLIENT_URL}
     networks:
-      - sparklewp-network
+      - dokploy-network
 
 networks:
-  sparklewp-network:
+  dokploy-network:
     external: true
-    name: sparklewp-network
+    name: dokploy-network
