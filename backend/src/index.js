@@ -13,6 +13,9 @@ const seedAdmin = require('./seed/seedAdmin');
 
 const app = express();
 
+// Trust proxy - required when behind Nginx/reverse proxy for rate limiting
+app.set('trust proxy', 1);
+
 app.use(express.json());
 app.use(cors({ origin: process.env.CLIENT_URL || '*' }));
 app.use(helmet());
