@@ -35,7 +35,7 @@ export default function Sidebar() {
     <div className="fixed left-0 top-0 w-[250px] h-screen bg-gradient-sidebar flex flex-col p-4 z-[1000] overflow-hidden">
       {/* Logo Section */}
       <div className="p-4 mb-4 text-center border-b border-white/10">
-        <h2 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+        <h2 className="text-2xl font-bold text-white">
           SparkleWP
         </h2>
       </div>
@@ -57,12 +57,12 @@ export default function Sidebar() {
                   max-w-[218px] overflow-hidden
                   border-l-3
                   ${isActive
-                    ? 'bg-brand-500/80 text-white border-l-brand-500'
+                    ? 'bg-white text-gray-900 border-l-white'
                     : 'bg-transparent text-white/80 border-l-transparent hover:bg-white/10'
                   }
                 `}
               >
-                <Icon size={18} className="flex-shrink-0" />
+                <Icon size={18} className={`flex-shrink-0 ${isActive ? 'text-gray-900' : ''}`} />
                 <span className="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis">
                   {item.label}
                 </span>

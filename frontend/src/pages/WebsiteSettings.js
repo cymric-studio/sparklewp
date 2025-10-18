@@ -227,7 +227,7 @@ export default function WebsiteSettings() {
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Plugins Stat */}
-            <div className="bg-white/98 backdrop-blur-glass border border-white/20 rounded-2xl p-6 shadow-lg">
+            <div className="bg-white dark:bg-gray-800 border border-white/20 rounded-2xl p-6 shadow-lg">
               <div className="flex justify-between items-start">
                 <div className="space-y-2">
                   <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wide">
@@ -247,7 +247,7 @@ export default function WebsiteSettings() {
             </div>
 
             {/* Themes Stat */}
-            <div className="bg-white/98 backdrop-blur-glass border border-white/20 rounded-2xl p-6 shadow-lg">
+            <div className="bg-white dark:bg-gray-800 border border-white/20 rounded-2xl p-6 shadow-lg">
               <div className="flex justify-between items-start">
                 <div className="space-y-2">
                   <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wide">
@@ -267,7 +267,7 @@ export default function WebsiteSettings() {
             </div>
 
             {/* WordPress Stat */}
-            <div className="bg-white/98 backdrop-blur-glass border border-white/20 rounded-2xl p-6 shadow-lg">
+            <div className="bg-white dark:bg-gray-800 border border-white/20 rounded-2xl p-6 shadow-lg">
               <div className="flex justify-between items-start">
                 <div className="space-y-2">
                   <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wide">
@@ -337,7 +337,7 @@ export default function WebsiteSettings() {
           </div>
 
           {/* Main Content Card */}
-          <div className="bg-white/98 backdrop-blur-glass border border-white/30 rounded-2xl p-8 shadow-xl">
+          <div className="bg-white dark:bg-gray-800 border border-white/30 rounded-2xl p-8 shadow-xl">
             {/* Plugins Content */}
             {activeTab === 'plugins' && (
               <div className="space-y-6">
