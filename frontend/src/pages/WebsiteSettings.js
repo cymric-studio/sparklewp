@@ -115,11 +115,11 @@ export default function WebsiteSettings() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-start space-x-3 p-5 rounded-xl border bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
-            <IconAlertCircle size={20} className="text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+          <div className="flex items-start space-x-3 p-5 rounded-xl border bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800">
+            <IconAlertCircle size={20} className="text-gray-600 dark:text-gray-400 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="font-semibold text-red-800 dark:text-red-200 mb-1">Website Not Found</p>
-              <p className="text-sm text-red-700 dark:text-red-300">
+              <p className="font-semibold text-gray-800 dark:text-gray-200 mb-1">Website Not Found</p>
+              <p className="text-sm text-gray-700 dark:text-gray-300">
                 The website you're looking for doesn't exist or you don't have access to it.
               </p>
             </div>
@@ -193,15 +193,15 @@ export default function WebsiteSettings() {
 
           {/* Alert Messages */}
           {error && (
-            <div className="flex items-start space-x-3 p-5 rounded-xl border bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
-              <IconAlertCircle size={20} className="text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+            <div className="flex items-start space-x-3 p-5 rounded-xl border bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800">
+              <IconAlertCircle size={20} className="text-gray-600 dark:text-gray-400 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
-                <p className="font-semibold text-red-800 dark:text-red-200 mb-1">Error</p>
-                <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+                <p className="font-semibold text-gray-800 dark:text-gray-200 mb-1">Error</p>
+                <p className="text-sm text-gray-700 dark:text-gray-300">{error}</p>
               </div>
               <button
                 onClick={() => setError('')}
-                className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200"
+                className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
               >
                 <IconX size={18} />
               </button>
@@ -209,15 +209,15 @@ export default function WebsiteSettings() {
           )}
 
           {success && (
-            <div className="flex items-start space-x-3 p-5 rounded-xl border bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
-              <IconCheck size={20} className="text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+            <div className="flex items-start space-x-3 p-5 rounded-xl border bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800">
+              <IconCheck size={20} className="text-gray-600 dark:text-gray-400 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
-                <p className="font-semibold text-green-800 dark:text-green-200 mb-1">Success</p>
-                <p className="text-sm text-green-700 dark:text-green-300">{success}</p>
+                <p className="font-semibold text-gray-800 dark:text-gray-200 mb-1">Success</p>
+                <p className="text-sm text-gray-700 dark:text-gray-300">{success}</p>
               </div>
               <button
                 onClick={() => setSuccess('')}
-                className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200"
+                className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
               >
                 <IconX size={18} />
               </button>
@@ -240,8 +240,8 @@ export default function WebsiteSettings() {
                     {pluginStats.active} active • {pluginStats.withUpdates} updates
                   </p>
                 </div>
-                <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-900/30">
-                  <IconPlugConnected size={28} className="text-indigo-600 dark:text-indigo-400" />
+                <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-900/30">
+                  <IconPlugConnected size={28} className="text-gray-600 dark:text-gray-400" />
                 </div>
               </div>
             </div>
@@ -260,8 +260,8 @@ export default function WebsiteSettings() {
                     {themeStats.active} active • {themeStats.withUpdates} updates
                   </p>
                 </div>
-                <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-purple-100 dark:bg-purple-900/30">
-                  <IconPalette size={28} className="text-purple-600 dark:text-purple-400" />
+                <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-900/30">
+                  <IconPalette size={28} className="text-gray-600 dark:text-gray-400" />
                 </div>
               </div>
             </div>
@@ -280,8 +280,8 @@ export default function WebsiteSettings() {
                     Last sync: {website.lastSync ? new Date(website.lastSync).toLocaleDateString() : 'Never'}
                   </p>
                 </div>
-                <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-green-100 dark:bg-green-900/30">
-                  <IconInfoCircle size={28} className="text-green-600 dark:text-green-400" />
+                <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-900/30">
+                  <IconInfoCircle size={28} className="text-gray-600 dark:text-gray-400" />
                 </div>
               </div>
             </div>
@@ -298,7 +298,7 @@ export default function WebsiteSettings() {
                 className={`flex items-center space-x-3 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
                   activeTab === 'plugins'
                     ? 'bg-gradient-primary text-white shadow-lg hover:shadow-xl'
-                    : 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-2 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/30'
+                    : 'bg-gray-50 dark:bg-gray-900/20 text-gray-600 dark:text-gray-400 border-2 border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900/30'
                 } hover:-translate-y-0.5`}
               >
                 <IconPlugConnected size={20} />
@@ -320,7 +320,7 @@ export default function WebsiteSettings() {
                 className={`flex items-center space-x-3 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
                   activeTab === 'themes'
                     ? 'bg-gradient-primary text-white shadow-lg hover:shadow-xl'
-                    : 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/30'
+                    : 'bg-gray-50 dark:bg-gray-900/20 text-gray-600 dark:text-gray-400 border-2 border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-900/30'
                 } hover:-translate-y-0.5`}
               >
                 <IconPalette size={20} />
@@ -349,7 +349,7 @@ export default function WebsiteSettings() {
                     <Button
                       variant="gradient"
                       size="md"
-                      className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 px-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
+                      className="bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900 px-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
                     >
                       {pluginStats.withUpdates} Updates Available
                     </Button>
@@ -357,9 +357,9 @@ export default function WebsiteSettings() {
                 </div>
 
                 {websitePlugins.length === 0 ? (
-                  <div className="flex items-start space-x-3 p-6 rounded-xl border bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-                    <IconInfoCircle size={24} className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                    <p className="text-blue-800 dark:text-blue-200">
+                  <div className="flex items-start space-x-3 p-6 rounded-xl border bg-gray-100 dark:bg-gray-800/20 border-gray-300 dark:border-gray-700">
+                    <IconInfoCircle size={24} className="text-gray-600 dark:text-gray-400 mt-0.5 flex-shrink-0" />
+                    <p className="text-gray-800 dark:text-gray-200">
                       No plugins data available. Make sure the SparkleWP Connector plugin is installed and active on your WordPress site.
                     </p>
                   </div>
@@ -391,7 +391,7 @@ export default function WebsiteSettings() {
                               {plugin.update_available && (
                                 <Badge
                                   size="md"
-                                  className="bg-gradient-to-r from-orange-500 to-red-500 text-white"
+                                  className="bg-gradient-to-r from-gray-600 to-gray-800 text-white"
                                 >
                                   Update Available
                                 </Badge>
@@ -406,7 +406,7 @@ export default function WebsiteSettings() {
                               <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                                 Version: <span className="font-bold text-gray-900 dark:text-gray-100">{plugin.version}</span>
                                 {plugin.update_available && plugin.latest_version && (
-                                  <span className="text-orange-600 dark:text-orange-400 font-semibold">
+                                  <span className="text-gray-600 dark:text-gray-400 font-semibold">
                                     {' → '}<span className="font-bold">{plugin.latest_version}</span>
                                   </span>
                                 )}
@@ -423,7 +423,7 @@ export default function WebsiteSettings() {
                             {plugin.update_available && (
                               <button
                                 title="Update plugin"
-                                className="w-11 h-11 flex items-center justify-center rounded-xl text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-all hover:scale-110"
+                                className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/20 hover:bg-gray-100 dark:hover:bg-gray-900/30 transition-all hover:scale-110"
                               >
                                 <IconDownload size={20} />
                               </button>
@@ -437,7 +437,7 @@ export default function WebsiteSettings() {
                             {!plugin.active && (
                               <button
                                 title="Delete plugin"
-                                className="w-11 h-11 flex items-center justify-center rounded-xl text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 transition-all hover:scale-110"
+                                className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/20 hover:bg-gray-100 dark:hover:bg-gray-900/30 transition-all hover:scale-110"
                               >
                                 <IconTrash size={20} />
                               </button>
@@ -462,7 +462,7 @@ export default function WebsiteSettings() {
                     <Button
                       variant="gradient"
                       size="md"
-                      className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 px-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
+                      className="bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900 px-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
                     >
                       {themeStats.withUpdates} Updates Available
                     </Button>
@@ -470,9 +470,9 @@ export default function WebsiteSettings() {
                 </div>
 
                 {websiteThemes.length === 0 ? (
-                  <div className="flex items-start space-x-3 p-6 rounded-xl border bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-                    <IconInfoCircle size={24} className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                    <p className="text-blue-800 dark:text-blue-200">
+                  <div className="flex items-start space-x-3 p-6 rounded-xl border bg-gray-100 dark:bg-gray-800/20 border-gray-300 dark:border-gray-700">
+                    <IconInfoCircle size={24} className="text-gray-600 dark:text-gray-400 mt-0.5 flex-shrink-0" />
+                    <p className="text-gray-800 dark:text-gray-200">
                       No themes data available. Make sure the SparkleWP Connector plugin is installed and active on your WordPress site.
                     </p>
                   </div>
@@ -499,7 +499,7 @@ export default function WebsiteSettings() {
                               {theme.update_available && (
                                 <Badge
                                   size="md"
-                                  className="bg-gradient-to-r from-orange-500 to-red-500 text-white"
+                                  className="bg-gradient-to-r from-gray-600 to-gray-800 text-white"
                                 >
                                   Update Available
                                 </Badge>
@@ -514,7 +514,7 @@ export default function WebsiteSettings() {
                               <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                                 Version: <span className="font-bold text-gray-900 dark:text-gray-100">{theme.version}</span>
                                 {theme.update_available && theme.latest_version && (
-                                  <span className="text-orange-600 dark:text-orange-400 font-semibold">
+                                  <span className="text-gray-600 dark:text-gray-400 font-semibold">
                                     {' → '}<span className="font-bold">{theme.latest_version}</span>
                                   </span>
                                 )}
@@ -531,7 +531,7 @@ export default function WebsiteSettings() {
                             {theme.update_available && (
                               <button
                                 title="Update theme"
-                                className="w-11 h-11 flex items-center justify-center rounded-xl text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-all hover:scale-110"
+                                className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/20 hover:bg-gray-100 dark:hover:bg-gray-900/30 transition-all hover:scale-110"
                               >
                                 <IconDownload size={20} />
                               </button>
@@ -545,7 +545,7 @@ export default function WebsiteSettings() {
                             {!theme.active && (
                               <button
                                 title="Delete theme"
-                                className="w-11 h-11 flex items-center justify-center rounded-xl text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 transition-all hover:scale-110"
+                                className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/20 hover:bg-gray-100 dark:hover:bg-gray-900/30 transition-all hover:scale-110"
                               >
                                 <IconTrash size={20} />
                               </button>

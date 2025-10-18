@@ -69,9 +69,9 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Error Alert */}
             {error && (
-              <div className="flex items-start space-x-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
-                <IconAlertCircle size={20} className="text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+              <div className="flex items-start space-x-3 p-4 bg-gray-50 dark:bg-gray-900/20 border border-gray-200 dark:border-gray-800 rounded-xl">
+                <IconAlertCircle size={20} className="text-gray-600 dark:text-gray-400 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-gray-800 dark:text-gray-200">{error}</p>
               </div>
             )}
 

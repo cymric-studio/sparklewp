@@ -221,11 +221,11 @@ export default function Websites() {
           {(error || success) && (
             <div className={`flex items-start space-x-3 p-5 rounded-xl border ${
               error
-                ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
-                : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                ? 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800'
+                : 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800'
             }`}>
-              {error ? <IconAlertCircle size={20} className="text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" /> : <IconCheck size={20} className="text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />}
-              <p className={`text-sm ${error ? 'text-red-800 dark:text-red-200' : 'text-green-800 dark:text-green-200'}`}>
+              {error ? <IconAlertCircle size={20} className="text-gray-600 dark:text-gray-400 mt-0.5 flex-shrink-0" /> : <IconCheck size={20} className="text-gray-600 dark:text-gray-400 mt-0.5 flex-shrink-0" />}
+              <p className={`text-sm ${error ? 'text-gray-800 dark:text-gray-200' : 'text-gray-800 dark:text-gray-200'}`}>
                 {error || success}
               </p>
             </div>
@@ -285,7 +285,7 @@ export default function Websites() {
                       <TableData>
                         <div className="flex items-center space-x-2">
                           <IconWorld size={16} className="text-gray-500 dark:text-gray-400" />
-                          <span className="text-blue-600 dark:text-blue-400">
+                          <span className="text-gray-600 dark:text-gray-400">
                             {website.url}
                           </span>
                         </div>
@@ -321,7 +321,7 @@ export default function Websites() {
                           {website.status !== 'connected' && (
                             <button
                               onClick={() => openConnectModal(website)}
-                              className="w-9 h-9 flex items-center justify-center rounded-xl text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all hover:scale-110"
+                              className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900/20 transition-all hover:scale-110"
                             >
                               <IconLink size={18} />
                             </button>
@@ -330,7 +330,7 @@ export default function Websites() {
                             <button
                               onClick={() => handleTestConnection(website)}
                               title="Test Connection & Refresh Data"
-                              className="w-9 h-9 flex items-center justify-center rounded-xl text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all hover:scale-110"
+                              className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800/20 transition-all hover:scale-110"
                             >
                               <IconRefresh size={18} />
                             </button>
@@ -344,7 +344,7 @@ export default function Websites() {
                           </button>
                           <button
                             onClick={() => openDeleteModal(website)}
-                            className="w-9 h-9 flex items-center justify-center rounded-xl text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all hover:scale-110"
+                            className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900/20 transition-all hover:scale-110"
                           >
                             <IconTrash size={18} />
                           </button>
@@ -428,9 +428,9 @@ export default function Websites() {
 
                 {connectionData.method === 'application_password' && (
                   <>
-                    <div className="flex items-start space-x-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                      <IconShield size={20} className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                      <div className="text-sm text-blue-800 dark:text-blue-200">
+                    <div className="flex items-start space-x-3 p-4 bg-gray-100 dark:bg-gray-800/20 border border-gray-300 dark:border-gray-700 rounded-lg">
+                      <IconShield size={20} className="text-gray-600 dark:text-gray-400 mt-0.5 flex-shrink-0" />
+                      <div className="text-sm text-gray-800 dark:text-gray-200">
                         <strong>Recommended:</strong> Application passwords are the most secure way to connect.
                         Create one in WordPress Admin → Users → Your Profile → Application Passwords.
                       </div>

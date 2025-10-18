@@ -182,11 +182,11 @@ export default function Users() {
           {(error || success) && (
             <div className={`flex items-start space-x-3 p-5 rounded-xl border ${
               error
-                ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
-                : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                ? 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800'
+                : 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800'
             }`}>
-              {error ? <IconAlertCircle size={20} className="text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" /> : <IconCheck size={20} className="text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />}
-              <p className={`text-sm ${error ? 'text-red-800 dark:text-red-200' : 'text-green-800 dark:text-green-200'}`}>
+              {error ? <IconAlertCircle size={20} className="text-gray-600 dark:text-gray-400 mt-0.5 flex-shrink-0" /> : <IconCheck size={20} className="text-gray-600 dark:text-gray-400 mt-0.5 flex-shrink-0" />}
+              <p className={`text-sm ${error ? 'text-gray-800 dark:text-gray-200' : 'text-gray-800 dark:text-gray-200'}`}>
                 {error || success}
               </p>
             </div>
@@ -255,14 +255,14 @@ export default function Users() {
                           <button
                             onClick={() => openEditModal(userItem)}
                             disabled={!isAdmin && userItem.role === 'administrator'}
-                            className="w-9 h-9 flex items-center justify-center rounded-xl text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800/20 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <IconEdit size={18} />
                           </button>
                           <button
                             onClick={() => openDeleteModal(userItem)}
                             disabled={!isAdmin}
-                            className="w-9 h-9 flex items-center justify-center rounded-xl text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900/20 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <IconTrash size={18} />
                           </button>
