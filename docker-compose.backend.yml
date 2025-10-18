@@ -14,6 +14,8 @@ services:
       - PORT=5000
       - USE_REAL_MONGO=true
       - MONGO_URI=mongodb://sparklewp-mongodb:27017/sparkle
+      - JWT_SECRET=${JWT_SECRET}
+      - CLIENT_URL=${CLIENT_URL}
     networks:
       - sparklewp-network
 
