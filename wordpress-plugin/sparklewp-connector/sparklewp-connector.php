@@ -580,6 +580,36 @@ class SparkleWP_Connector {
             'callback' => array($this, 'test_connection'),
             'permission_callback' => array($this, 'check_permissions')
         ));
+
+        register_rest_route('sparklewp/v1', '/plugin/update', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'update_plugin'),
+            'permission_callback' => array($this, 'check_permissions')
+        ));
+
+        register_rest_route('sparklewp/v1', '/plugin/activate', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'activate_plugin'),
+            'permission_callback' => array($this, 'check_permissions')
+        ));
+
+        register_rest_route('sparklewp/v1', '/plugin/deactivate', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'deactivate_plugin'),
+            'permission_callback' => array($this, 'check_permissions')
+        ));
+
+        register_rest_route('sparklewp/v1', '/theme/update', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'update_theme'),
+            'permission_callback' => array($this, 'check_permissions')
+        ));
+
+        register_rest_route('sparklewp/v1', '/theme/activate', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'activate_theme'),
+            'permission_callback' => array($this, 'check_permissions')
+        ));
     }
 
     /**
@@ -798,6 +828,274 @@ class SparkleWP_Connector {
         }
 
         return null;
+    }
+
+    /**
+     * Update plugin endpoint
+     */
+    public function update_plugin($request) {
+        $slug = $request->get_param('slug');
+
+        if (empty($slug)) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Plugin slug is required'
+            ), 400);
+        }
+
+        // Load required WordPress files
+        if (!function_exists('get_plugins')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+        if (!function_exists('request_filesystem_credentials')) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+        require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+
+        // Find the plugin file
+        $all_plugins = get_plugins();
+        $plugin_file = null;
+
+        foreach ($all_plugins as $file => $info) {
+            if (dirname($file) === $slug || $file === $slug . '.php') {
+                $plugin_file = $file;
+                break;
+            }
+        }
+
+        if (!$plugin_file) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Plugin not found'
+            ), 404);
+        }
+
+        // Check if update is available
+        wp_update_plugins();
+        $update_plugins = get_site_transient('update_plugins');
+
+        if (!isset($update_plugins->response[$plugin_file])) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'No update available for this plugin'
+            ), 400);
+        }
+
+        // Perform the update
+        include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+        $upgrader = new Plugin_Upgrader(new WP_Ajax_Upgrader_Skin());
+        $result = $upgrader->upgrade($plugin_file);
+
+        if (is_wp_error($result)) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => $result->get_error_message()
+            ), 500);
+        }
+
+        if ($result === false) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Plugin update failed'
+            ), 500);
+        }
+
+        return new WP_REST_Response(array(
+            'success' => true,
+            'message' => 'Plugin updated successfully'
+        ), 200);
+    }
+
+    /**
+     * Activate plugin endpoint
+     */
+    public function activate_plugin($request) {
+        $slug = $request->get_param('slug');
+
+        if (empty($slug)) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Plugin slug is required'
+            ), 400);
+        }
+
+        // Load required WordPress files
+        if (!function_exists('get_plugins')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+
+        // Find the plugin file
+        $all_plugins = get_plugins();
+        $plugin_file = null;
+
+        foreach ($all_plugins as $file => $info) {
+            if (dirname($file) === $slug || $file === $slug . '.php') {
+                $plugin_file = $file;
+                break;
+            }
+        }
+
+        if (!$plugin_file) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Plugin not found'
+            ), 404);
+        }
+
+        // Activate the plugin
+        $result = activate_plugin($plugin_file);
+
+        if (is_wp_error($result)) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => $result->get_error_message()
+            ), 500);
+        }
+
+        return new WP_REST_Response(array(
+            'success' => true,
+            'message' => 'Plugin activated successfully'
+        ), 200);
+    }
+
+    /**
+     * Deactivate plugin endpoint
+     */
+    public function deactivate_plugin($request) {
+        $slug = $request->get_param('slug');
+
+        if (empty($slug)) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Plugin slug is required'
+            ), 400);
+        }
+
+        // Load required WordPress files
+        if (!function_exists('get_plugins')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+
+        // Find the plugin file
+        $all_plugins = get_plugins();
+        $plugin_file = null;
+
+        foreach ($all_plugins as $file => $info) {
+            if (dirname($file) === $slug || $file === $slug . '.php') {
+                $plugin_file = $file;
+                break;
+            }
+        }
+
+        if (!$plugin_file) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Plugin not found'
+            ), 404);
+        }
+
+        // Deactivate the plugin
+        deactivate_plugins($plugin_file);
+
+        return new WP_REST_Response(array(
+            'success' => true,
+            'message' => 'Plugin deactivated successfully'
+        ), 200);
+    }
+
+    /**
+     * Update theme endpoint
+     */
+    public function update_theme($request) {
+        $slug = $request->get_param('slug');
+
+        if (empty($slug)) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Theme slug is required'
+            ), 400);
+        }
+
+        // Check if theme exists
+        $theme = wp_get_theme($slug);
+        if (!$theme->exists()) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Theme not found'
+            ), 404);
+        }
+
+        // Load required WordPress files
+        if (!function_exists('request_filesystem_credentials')) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+        require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+
+        // Check if update is available
+        wp_update_themes();
+        $update_themes = get_site_transient('update_themes');
+
+        if (!isset($update_themes->response[$slug])) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'No update available for this theme'
+            ), 400);
+        }
+
+        // Perform the update
+        include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+        $upgrader = new Theme_Upgrader(new WP_Ajax_Upgrader_Skin());
+        $result = $upgrader->upgrade($slug);
+
+        if (is_wp_error($result)) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => $result->get_error_message()
+            ), 500);
+        }
+
+        if ($result === false) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Theme update failed'
+            ), 500);
+        }
+
+        return new WP_REST_Response(array(
+            'success' => true,
+            'message' => 'Theme updated successfully'
+        ), 200);
+    }
+
+    /**
+     * Activate theme endpoint
+     */
+    public function activate_theme($request) {
+        $slug = $request->get_param('slug');
+
+        if (empty($slug)) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Theme slug is required'
+            ), 400);
+        }
+
+        // Check if theme exists
+        $theme = wp_get_theme($slug);
+        if (!$theme->exists()) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Theme not found'
+            ), 404);
+        }
+
+        // Switch to the theme
+        switch_theme($slug);
+
+        return new WP_REST_Response(array(
+            'success' => true,
+            'message' => 'Theme activated successfully'
+        ), 200);
     }
 }
 
