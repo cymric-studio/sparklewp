@@ -653,7 +653,14 @@ class SparkleWP_Connector {
             // Check for updates from WordPress.org repository
             $update_available = false;
             $latest_version = null;
+
+            // Get plugin slug - handle both directory-based and single-file plugins
             $plugin_slug = dirname($plugin_file);
+
+            // For single-file plugins (like hello-dolly.php), use the filename without extension
+            if ($plugin_slug === '.' || empty($plugin_slug)) {
+                $plugin_slug = basename($plugin_file, '.php');
+            }
 
             if ($plugin_slug && $plugin_slug !== '.') {
                 $latest_version = $this->check_plugin_version($plugin_slug);
@@ -857,7 +864,14 @@ class SparkleWP_Connector {
         $plugin_file = null;
 
         foreach ($all_plugins as $file => $info) {
-            if (dirname($file) === $slug || $file === $slug . '.php') {
+            $file_slug = dirname($file);
+
+            // Handle single-file plugins
+            if ($file_slug === '.' || empty($file_slug)) {
+                $file_slug = basename($file, '.php');
+            }
+
+            if ($file_slug === $slug) {
                 $plugin_file = $file;
                 break;
             }
@@ -929,7 +943,14 @@ class SparkleWP_Connector {
         $plugin_file = null;
 
         foreach ($all_plugins as $file => $info) {
-            if (dirname($file) === $slug || $file === $slug . '.php') {
+            $file_slug = dirname($file);
+
+            // Handle single-file plugins
+            if ($file_slug === '.' || empty($file_slug)) {
+                $file_slug = basename($file, '.php');
+            }
+
+            if ($file_slug === $slug) {
                 $plugin_file = $file;
                 break;
             }
@@ -981,7 +1002,14 @@ class SparkleWP_Connector {
         $plugin_file = null;
 
         foreach ($all_plugins as $file => $info) {
-            if (dirname($file) === $slug || $file === $slug . '.php') {
+            $file_slug = dirname($file);
+
+            // Handle single-file plugins
+            if ($file_slug === '.' || empty($file_slug)) {
+                $file_slug = basename($file, '.php');
+            }
+
+            if ($file_slug === $slug) {
                 $plugin_file = $file;
                 break;
             }

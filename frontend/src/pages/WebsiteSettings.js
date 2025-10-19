@@ -89,18 +89,27 @@ export default function WebsiteSettings() {
   };
 
   const handlePluginUpdate = async (pluginSlug, pluginName) => {
+    // Validate slug before making API call
+    if (!pluginSlug || pluginSlug === '.' || pluginSlug.trim() === '') {
+      console.error('Invalid plugin slug:', pluginSlug);
+      setError('Cannot update plugin: Invalid plugin identifier');
+      return;
+    }
+
     const key = `plugin-update-${pluginSlug}`;
     setActionLoading(prev => ({ ...prev, [key]: true }));
     setError('');
     setSuccess('');
 
     try {
+      console.log(`Updating plugin: ${pluginName} (${pluginSlug})`);
       await api.post(`/api/websites/${id}/plugins/${pluginSlug}/update`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess(`Successfully updated ${pluginName}`);
       await fetchWebsiteDetails();
     } catch (err) {
+      console.error('Plugin update error:', err);
       setError(err.response?.data?.message || `Failed to update ${pluginName}`);
     } finally {
       setActionLoading(prev => ({ ...prev, [key]: false }));
@@ -108,6 +117,13 @@ export default function WebsiteSettings() {
   };
 
   const handlePluginToggle = async (pluginSlug, pluginName, currentStatus) => {
+    // Validate slug before making API call
+    if (!pluginSlug || pluginSlug === '.' || pluginSlug.trim() === '') {
+      console.error('Invalid plugin slug:', pluginSlug);
+      setError('Cannot toggle plugin: Invalid plugin identifier');
+      return;
+    }
+
     const key = `plugin-toggle-${pluginSlug}`;
     setActionLoading(prev => ({ ...prev, [key]: true }));
     setError('');
@@ -115,12 +131,14 @@ export default function WebsiteSettings() {
 
     try {
       const action = currentStatus ? 'deactivate' : 'activate';
+      console.log(`${action} plugin: ${pluginName} (${pluginSlug})`);
       await api.post(`/api/websites/${id}/plugins/${pluginSlug}/${action}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess(`Successfully ${action}d ${pluginName}`);
       await fetchWebsiteDetails();
     } catch (err) {
+      console.error('Plugin toggle error:', err);
       setError(err.response?.data?.message || `Failed to ${currentStatus ? 'deactivate' : 'activate'} ${pluginName}`);
     } finally {
       setActionLoading(prev => ({ ...prev, [key]: false }));
@@ -128,18 +146,27 @@ export default function WebsiteSettings() {
   };
 
   const handleThemeUpdate = async (themeSlug, themeName) => {
+    // Validate slug before making API call
+    if (!themeSlug || themeSlug.trim() === '') {
+      console.error('Invalid theme slug:', themeSlug);
+      setError('Cannot update theme: Invalid theme identifier');
+      return;
+    }
+
     const key = `theme-update-${themeSlug}`;
     setActionLoading(prev => ({ ...prev, [key]: true }));
     setError('');
     setSuccess('');
 
     try {
+      console.log(`Updating theme: ${themeName} (${themeSlug})`);
       await api.post(`/api/websites/${id}/themes/${themeSlug}/update`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess(`Successfully updated ${themeName}`);
       await fetchWebsiteDetails();
     } catch (err) {
+      console.error('Theme update error:', err);
       setError(err.response?.data?.message || `Failed to update ${themeName}`);
     } finally {
       setActionLoading(prev => ({ ...prev, [key]: false }));
@@ -147,18 +174,27 @@ export default function WebsiteSettings() {
   };
 
   const handleThemeActivate = async (themeSlug, themeName) => {
+    // Validate slug before making API call
+    if (!themeSlug || themeSlug.trim() === '') {
+      console.error('Invalid theme slug:', themeSlug);
+      setError('Cannot activate theme: Invalid theme identifier');
+      return;
+    }
+
     const key = `theme-activate-${themeSlug}`;
     setActionLoading(prev => ({ ...prev, [key]: true }));
     setError('');
     setSuccess('');
 
     try {
+      console.log(`Activating theme: ${themeName} (${themeSlug})`);
       await api.post(`/api/websites/${id}/themes/${themeSlug}/activate`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess(`Successfully activated ${themeName}`);
       await fetchWebsiteDetails();
     } catch (err) {
+      console.error('Theme activate error:', err);
       setError(err.response?.data?.message || `Failed to activate ${themeName}`);
     } finally {
       setActionLoading(prev => ({ ...prev, [key]: false }));
