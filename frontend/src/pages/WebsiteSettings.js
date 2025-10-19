@@ -369,6 +369,52 @@ export default function WebsiteSettings() {
     setBulkActionLoading(false);
   };
 
+  const handleBulkDelete = async () => {
+    const pluginsToDelete = websitePlugins.filter(p =>
+      selectedPlugins.includes(p.slug) && !p.active && !isSparkleWPConnector(p)
+    );
+
+    if (pluginsToDelete.length === 0) {
+      setError('No inactive plugins selected (excluding SparkleWP Connector and active plugins)');
+      return;
+    }
+
+    const pluginNames = pluginsToDelete.map(p => p.name).join(', ');
+    if (!window.confirm(`Are you sure you want to delete ${pluginsToDelete.length} plugin(s)?\n\n${pluginNames}\n\nThis action cannot be undone.`)) {
+      return;
+    }
+
+    setBulkActionLoading(true);
+    setError('');
+    setSuccess('');
+
+    let successCount = 0;
+    let failedPlugins = [];
+
+    for (const plugin of pluginsToDelete) {
+      try {
+        console.log(`Bulk deleting plugin: ${plugin.name} (${plugin.slug})`);
+        await api.delete(`/api/websites/${id}/plugins/${plugin.slug}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        successCount++;
+      } catch (err) {
+        console.error(`Failed to delete ${plugin.name}:`, err);
+        failedPlugins.push(plugin.name);
+      }
+    }
+
+    if (successCount > 0) {
+      setSuccess(`Successfully deleted ${successCount} plugin(s)${failedPlugins.length > 0 ? `. Failed: ${failedPlugins.join(', ')}` : ''}`);
+    } else {
+      setError(`Failed to delete plugins: ${failedPlugins.join(', ')}`);
+    }
+
+    await fetchWebsiteDetails(false);
+    setSelectedPlugins([]);
+    setBulkActionLoading(false);
+  };
+
   const handlePluginDelete = async (pluginSlug, pluginName) => {
     // Validate slug before making API call
     if (!pluginSlug || pluginSlug === '.' || pluginSlug.trim() === '') {
@@ -728,9 +774,18 @@ export default function WebsiteSettings() {
                           size="sm"
                           onClick={handleBulkDeactivate}
                           disabled={bulkActionLoading}
-                          className="bg-red-600 hover:bg-red-700 text-white"
+                          className="bg-orange-600 hover:bg-orange-700 text-white"
                         >
                           Deactivate Selected
+                        </Button>
+                        <Button
+                          variant="filled"
+                          size="sm"
+                          onClick={handleBulkDelete}
+                          disabled={bulkActionLoading || websitePlugins.filter(p => selectedPlugins.includes(p.slug) && !p.active && !isSparkleWPConnector(p)).length === 0}
+                          className="bg-red-600 hover:bg-red-700 text-white"
+                        >
+                          Delete Selected
                         </Button>
                       </div>
                     )}
