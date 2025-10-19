@@ -37,8 +37,10 @@ export default function WebsiteSettings() {
     fetchWebsiteDetails();
   }, [id]);
 
-  const fetchWebsiteDetails = async () => {
-    setLoading(true);
+  const fetchWebsiteDetails = async (showFullPageLoader = true) => {
+    if (showFullPageLoader) {
+      setLoading(true);
+    }
     setError('');
 
     try {
@@ -65,7 +67,9 @@ export default function WebsiteSettings() {
       console.error('Error fetching website details:', err);
       setError(err.response?.data?.message || 'Failed to fetch website details');
     } finally {
-      setLoading(false);
+      if (showFullPageLoader) {
+        setLoading(false);
+      }
     }
   };
 
@@ -107,7 +111,7 @@ export default function WebsiteSettings() {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess(`Successfully updated ${pluginName}`);
-      await fetchWebsiteDetails();
+      await fetchWebsiteDetails(false);
     } catch (err) {
       console.error('Plugin update error:', err);
       setError(err.response?.data?.message || `Failed to update ${pluginName}`);
@@ -136,7 +140,7 @@ export default function WebsiteSettings() {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess(`Successfully ${action}d ${pluginName}`);
-      await fetchWebsiteDetails();
+      await fetchWebsiteDetails(false);
     } catch (err) {
       console.error('Plugin toggle error:', err);
       setError(err.response?.data?.message || `Failed to ${currentStatus ? 'deactivate' : 'activate'} ${pluginName}`);
@@ -164,7 +168,7 @@ export default function WebsiteSettings() {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess(`Successfully updated ${themeName}`);
-      await fetchWebsiteDetails();
+      await fetchWebsiteDetails(false);
     } catch (err) {
       console.error('Theme update error:', err);
       setError(err.response?.data?.message || `Failed to update ${themeName}`);
@@ -192,7 +196,7 @@ export default function WebsiteSettings() {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess(`Successfully activated ${themeName}`);
-      await fetchWebsiteDetails();
+      await fetchWebsiteDetails(false);
     } catch (err) {
       console.error('Theme activate error:', err);
       setError(err.response?.data?.message || `Failed to activate ${themeName}`);
