@@ -369,6 +369,70 @@ export default function WebsiteSettings() {
     setBulkActionLoading(false);
   };
 
+  const handlePluginDelete = async (pluginSlug, pluginName) => {
+    // Validate slug before making API call
+    if (!pluginSlug || pluginSlug === '.' || pluginSlug.trim() === '') {
+      console.error('Invalid plugin slug:', pluginSlug);
+      setError('Cannot delete plugin: Invalid plugin identifier');
+      return;
+    }
+
+    if (!window.confirm(`Are you sure you want to delete ${pluginName}? This action cannot be undone.`)) {
+      return;
+    }
+
+    const key = `plugin-delete-${pluginSlug}`;
+    setActionLoading(prev => ({ ...prev, [key]: true }));
+    setError('');
+    setSuccess('');
+
+    try {
+      console.log(`Deleting plugin: ${pluginName} (${pluginSlug})`);
+      await api.delete(`/api/websites/${id}/plugins/${pluginSlug}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSuccess(`Successfully deleted ${pluginName}`);
+      await fetchWebsiteDetails(false);
+    } catch (err) {
+      console.error('Plugin delete error:', err);
+      setError(err.response?.data?.message || `Failed to delete ${pluginName}`);
+    } finally {
+      setActionLoading(prev => ({ ...prev, [key]: false }));
+    }
+  };
+
+  const handleThemeDelete = async (themeSlug, themeName) => {
+    // Validate slug before making API call
+    if (!themeSlug || themeSlug.trim() === '') {
+      console.error('Invalid theme slug:', themeSlug);
+      setError('Cannot delete theme: Invalid theme identifier');
+      return;
+    }
+
+    if (!window.confirm(`Are you sure you want to delete ${themeName}? This action cannot be undone.`)) {
+      return;
+    }
+
+    const key = `theme-delete-${themeSlug}`;
+    setActionLoading(prev => ({ ...prev, [key]: true }));
+    setError('');
+    setSuccess('');
+
+    try {
+      console.log(`Deleting theme: ${themeName} (${themeSlug})`);
+      await api.delete(`/api/websites/${id}/themes/${themeSlug}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSuccess(`Successfully deleted ${themeName}`);
+      await fetchWebsiteDetails(false);
+    } catch (err) {
+      console.error('Theme delete error:', err);
+      setError(err.response?.data?.message || `Failed to delete ${themeName}`);
+    } finally {
+      setActionLoading(prev => ({ ...prev, [key]: false }));
+    }
+  };
+
   if (loading) {
     return (
       <div className="relative min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -776,6 +840,20 @@ export default function WebsiteSettings() {
                                 <IconCheck size={20} className="text-green-600" />
                               </div>
                             )}
+                            {!plugin.active && !isSparkleWPConnector(plugin) && (
+                              <button
+                                title="Delete plugin"
+                                onClick={() => handlePluginDelete(plugin.slug, plugin.name)}
+                                disabled={actionLoading[`plugin-delete-${plugin.slug}`]}
+                                className="w-11 h-11 flex items-center justify-center rounded-xl text-red-600 dark:text-red-500 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {actionLoading[`plugin-delete-${plugin.slug}`] ? (
+                                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-red-600 border-t-transparent"></div>
+                                ) : (
+                                  <IconTrash size={20} />
+                                )}
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -883,6 +961,20 @@ export default function WebsiteSettings() {
                                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-600 border-t-transparent"></div>
                                 ) : (
                                   <IconPlayerPlay size={20} />
+                                )}
+                              </button>
+                            )}
+                            {!theme.active && (
+                              <button
+                                title="Delete theme"
+                                onClick={() => handleThemeDelete(theme.slug, theme.name)}
+                                disabled={actionLoading[`theme-delete-${theme.slug}`]}
+                                className="w-11 h-11 flex items-center justify-center rounded-xl text-red-600 dark:text-red-500 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {actionLoading[`theme-delete-${theme.slug}`] ? (
+                                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-red-600 border-t-transparent"></div>
+                                ) : (
+                                  <IconTrash size={20} />
                                 )}
                               </button>
                             )}

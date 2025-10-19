@@ -1199,6 +1199,112 @@ class WordPressApiClient {
       throw error;
     }
   }
+
+  async deletePlugin(slug) {
+    const { method, username, password } = this.connectionData;
+
+    if (!username || !password) {
+      throw new Error('Authentication required');
+    }
+
+    try {
+      const cleanPassword = password.replace(/\s+/g, '').trim();
+      const credentials = Buffer.from(`${username}:${cleanPassword}`).toString('base64');
+      const authHeaders = {
+        'Authorization': `Basic ${credentials}`,
+        'User-Agent': 'SparkleWP/1.0',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      };
+
+      console.log(`Deleting plugin ${slug} on ${this.siteUrl}...`);
+
+      // Try SparkleWP Connector plugin endpoint first
+      try {
+        console.log('Trying SparkleWP Connector plugin delete endpoint...');
+        const connectorResponse = await axios.post(
+          `${this.siteUrl}/wp-json/sparklewp/v1/plugin/delete`,
+          { slug: slug },
+          {
+            headers: authHeaders,
+            timeout: this.timeout,
+            validateStatus: (status) => status < 500
+          }
+        );
+
+        if (connectorResponse.status === 200 && connectorResponse.data && connectorResponse.data.success) {
+          console.log(`Plugin ${slug} deleted successfully via SparkleWP Connector`);
+          return connectorResponse.data;
+        }
+      } catch (connectorError) {
+        console.log('SparkleWP Connector delete endpoint not available:', connectorError.message);
+      }
+
+      // Fallback: WordPress REST API doesn't have native delete endpoint
+      throw new Error('Plugin deletion requires the SparkleWP Connector plugin to be installed and activated on the WordPress site');
+
+    } catch (error) {
+      console.error('Failed to delete plugin:', error.message);
+      if (error.response) {
+        console.log(`HTTP Error: ${error.response.status} - ${error.response.statusText}`);
+        console.log('Response data:', error.response.data);
+      }
+      throw error;
+    }
+  }
+
+  async deleteTheme(slug) {
+    const { method, username, password } = this.connectionData;
+
+    if (!username || !password) {
+      throw new Error('Authentication required');
+    }
+
+    try {
+      const cleanPassword = password.replace(/\s+/g, '').trim();
+      const credentials = Buffer.from(`${username}:${cleanPassword}`).toString('base64');
+      const authHeaders = {
+        'Authorization': `Basic ${credentials}`,
+        'User-Agent': 'SparkleWP/1.0',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      };
+
+      console.log(`Deleting theme ${slug} on ${this.siteUrl}...`);
+
+      // Try SparkleWP Connector plugin endpoint first
+      try {
+        console.log('Trying SparkleWP Connector theme delete endpoint...');
+        const connectorResponse = await axios.post(
+          `${this.siteUrl}/wp-json/sparklewp/v1/theme/delete`,
+          { slug: slug },
+          {
+            headers: authHeaders,
+            timeout: this.timeout,
+            validateStatus: (status) => status < 500
+          }
+        );
+
+        if (connectorResponse.status === 200 && connectorResponse.data && connectorResponse.data.success) {
+          console.log(`Theme ${slug} deleted successfully via SparkleWP Connector`);
+          return connectorResponse.data;
+        }
+      } catch (connectorError) {
+        console.log('SparkleWP Connector theme delete endpoint not available:', connectorError.message);
+      }
+
+      // Fallback: WordPress REST API doesn't have native delete endpoint for themes
+      throw new Error('Theme deletion requires the SparkleWP Connector plugin to be installed and activated on the WordPress site');
+
+    } catch (error) {
+      console.error('Failed to delete theme:', error.message);
+      if (error.response) {
+        console.log(`HTTP Error: ${error.response.status} - ${error.response.statusText}`);
+        console.log('Response data:', error.response.data);
+      }
+      throw error;
+    }
+  }
 }
 
 module.exports = WordPressApiClient;

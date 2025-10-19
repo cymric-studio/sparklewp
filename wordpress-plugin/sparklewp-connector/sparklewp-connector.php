@@ -610,6 +610,18 @@ class SparkleWP_Connector {
             'callback' => array($this, 'activate_theme'),
             'permission_callback' => array($this, 'check_permissions')
         ));
+
+        register_rest_route('sparklewp/v1', '/plugin/delete', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'delete_plugin'),
+            'permission_callback' => array($this, 'check_permissions')
+        ));
+
+        register_rest_route('sparklewp/v1', '/theme/delete', array(
+            'methods' => 'POST',
+            'callback' => array($this, 'delete_theme'),
+            'permission_callback' => array($this, 'check_permissions')
+        ));
     }
 
     /**
@@ -1123,6 +1135,142 @@ class SparkleWP_Connector {
         return new WP_REST_Response(array(
             'success' => true,
             'message' => 'Theme activated successfully'
+        ), 200);
+    }
+
+    /**
+     * Delete plugin endpoint
+     */
+    public function delete_plugin($request) {
+        $slug = $request->get_param('slug');
+
+        if (empty($slug)) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Plugin slug is required'
+            ), 400);
+        }
+
+        // Load required WordPress files
+        if (!function_exists('get_plugins')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+        if (!function_exists('delete_plugins')) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+
+        // Find the plugin file
+        $all_plugins = get_plugins();
+        $plugin_file = null;
+
+        foreach ($all_plugins as $file => $info) {
+            $file_slug = dirname($file);
+
+            // Handle single-file plugins
+            if ($file_slug === '.' || empty($file_slug)) {
+                $file_slug = basename($file, '.php');
+            }
+
+            if ($file_slug === $slug) {
+                $plugin_file = $file;
+                break;
+            }
+        }
+
+        if (!$plugin_file) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Plugin not found'
+            ), 404);
+        }
+
+        // Check if plugin is active - cannot delete active plugins
+        if (is_plugin_active($plugin_file)) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Cannot delete an active plugin. Please deactivate it first.'
+            ), 400);
+        }
+
+        // Delete the plugin
+        $result = delete_plugins(array($plugin_file));
+
+        if (is_wp_error($result)) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => $result->get_error_message()
+            ), 500);
+        }
+
+        if ($result === false) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Failed to delete plugin'
+            ), 500);
+        }
+
+        return new WP_REST_Response(array(
+            'success' => true,
+            'message' => 'Plugin deleted successfully'
+        ), 200);
+    }
+
+    /**
+     * Delete theme endpoint
+     */
+    public function delete_theme($request) {
+        $slug = $request->get_param('slug');
+
+        if (empty($slug)) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Theme slug is required'
+            ), 400);
+        }
+
+        // Check if theme exists
+        $theme = wp_get_theme($slug);
+        if (!$theme->exists()) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Theme not found'
+            ), 404);
+        }
+
+        // Check if theme is currently active - cannot delete active theme
+        $current_theme = wp_get_theme();
+        if ($current_theme->get_stylesheet() === $slug) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Cannot delete the active theme. Please activate a different theme first.'
+            ), 400);
+        }
+
+        // Load required WordPress files
+        if (!function_exists('delete_theme')) {
+            require_once ABSPATH . 'wp-admin/includes/theme.php';
+        }
+
+        // Delete the theme
+        $result = delete_theme($slug);
+
+        if (is_wp_error($result)) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => $result->get_error_message()
+            ), 500);
+        }
+
+        if ($result === false) {
+            return new WP_REST_Response(array(
+                'success' => false,
+                'message' => 'Failed to delete theme'
+            ), 500);
+        }
+
+        return new WP_REST_Response(array(
+            'success' => true,
+            'message' => 'Theme deleted successfully'
         ), 200);
     }
 }

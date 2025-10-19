@@ -445,6 +445,58 @@ router.post('/:id/themes/:slug/activate', auth, async (req, res) => {
   }
 });
 
+// Delete plugin
+router.delete('/:id/plugins/:slug', auth, async (req, res) => {
+  try {
+    const website = await Website.findById(req.params.id);
+    if (!website) {
+      return res.status(404).json({ message: 'Website not found' });
+    }
+
+    if (website.status !== 'connected' || !website.connectionData) {
+      return res.status(400).json({ message: 'Website is not connected' });
+    }
+
+    const wpClient = new WordPressApiClient(website.url, {
+      method: website.connectionMethod,
+      username: website.connectionData.username,
+      password: website.connectionData.encryptedPassword,
+      apiKey: website.connectionData.apiKey
+    });
+
+    await wpClient.deletePlugin(req.params.slug);
+    res.json({ message: 'Plugin deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete plugin', error: error.message });
+  }
+});
+
+// Delete theme
+router.delete('/:id/themes/:slug', auth, async (req, res) => {
+  try {
+    const website = await Website.findById(req.params.id);
+    if (!website) {
+      return res.status(404).json({ message: 'Website not found' });
+    }
+
+    if (website.status !== 'connected' || !website.connectionData) {
+      return res.status(400).json({ message: 'Website is not connected' });
+    }
+
+    const wpClient = new WordPressApiClient(website.url, {
+      method: website.connectionMethod,
+      username: website.connectionData.username,
+      password: website.connectionData.encryptedPassword,
+      apiKey: website.connectionData.apiKey
+    });
+
+    await wpClient.deleteTheme(req.params.slug);
+    res.json({ message: 'Theme deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete theme', error: error.message });
+  }
+});
+
 // Delete website
 router.delete('/:id', auth, async (req, res) => {
   try {
