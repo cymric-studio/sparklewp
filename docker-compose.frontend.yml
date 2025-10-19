@@ -12,9 +12,9 @@ services:
     ports:
       - "3000:80"
     networks:
-      - sparklewp-network
+      - dokploy-network
 
 networks:
-  sparklewp-network:
+  dokploy-network:
     external: true
-    name: sparklewp-network
+    name: dokploy-network
