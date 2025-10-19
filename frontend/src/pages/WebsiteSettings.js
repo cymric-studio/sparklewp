@@ -30,6 +30,8 @@ export default function WebsiteSettings() {
   const [success, setSuccess] = useState('');
   const [activeTab, setActiveTab] = useState('plugins');
   const [actionLoading, setActionLoading] = useState({});
+  const [selectedPlugins, setSelectedPlugins] = useState([]);
+  const [bulkActionLoading, setBulkActionLoading] = useState(false);
 
   const token = localStorage.getItem('token');
 
@@ -220,6 +222,151 @@ export default function WebsiteSettings() {
     const active = items.filter(item => item.active).length;
 
     return { total, withUpdates, active };
+  };
+
+  const isSparkleWPConnector = (plugin) => {
+    return plugin.slug === 'sparklewp-connector' || plugin.name === 'SparkleWP Connector';
+  };
+
+  const handleSelectPlugin = (pluginSlug) => {
+    setSelectedPlugins(prev => {
+      if (prev.includes(pluginSlug)) {
+        return prev.filter(s => s !== pluginSlug);
+      } else {
+        return [...prev, pluginSlug];
+      }
+    });
+  };
+
+  const handleSelectAllPlugins = () => {
+    if (selectedPlugins.length === websitePlugins.length) {
+      setSelectedPlugins([]);
+    } else {
+      setSelectedPlugins(websitePlugins.map(p => p.slug));
+    }
+  };
+
+  const handleBulkUpdate = async () => {
+    const pluginsToUpdate = websitePlugins.filter(p =>
+      selectedPlugins.includes(p.slug) && p.update_available
+    );
+
+    if (pluginsToUpdate.length === 0) {
+      setError('No plugins with updates selected');
+      return;
+    }
+
+    setBulkActionLoading(true);
+    setError('');
+    setSuccess('');
+
+    let successCount = 0;
+    let failedPlugins = [];
+
+    for (const plugin of pluginsToUpdate) {
+      try {
+        console.log(`Bulk updating plugin: ${plugin.name} (${plugin.slug})`);
+        await api.post(`/api/websites/${id}/plugins/${plugin.slug}/update`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        successCount++;
+      } catch (err) {
+        console.error(`Failed to update ${plugin.name}:`, err);
+        failedPlugins.push(plugin.name);
+      }
+    }
+
+    if (successCount > 0) {
+      setSuccess(`Successfully updated ${successCount} plugin(s)${failedPlugins.length > 0 ? `. Failed: ${failedPlugins.join(', ')}` : ''}`);
+    } else {
+      setError(`Failed to update plugins: ${failedPlugins.join(', ')}`);
+    }
+
+    await fetchWebsiteDetails(false);
+    setSelectedPlugins([]);
+    setBulkActionLoading(false);
+  };
+
+  const handleBulkActivate = async () => {
+    const pluginsToActivate = websitePlugins.filter(p =>
+      selectedPlugins.includes(p.slug) && !p.active && !isSparkleWPConnector(p)
+    );
+
+    if (pluginsToActivate.length === 0) {
+      setError('No inactive plugins selected (excluding SparkleWP Connector)');
+      return;
+    }
+
+    setBulkActionLoading(true);
+    setError('');
+    setSuccess('');
+
+    let successCount = 0;
+    let failedPlugins = [];
+
+    for (const plugin of pluginsToActivate) {
+      try {
+        console.log(`Bulk activating plugin: ${plugin.name} (${plugin.slug})`);
+        await api.post(`/api/websites/${id}/plugins/${plugin.slug}/activate`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        successCount++;
+      } catch (err) {
+        console.error(`Failed to activate ${plugin.name}:`, err);
+        failedPlugins.push(plugin.name);
+      }
+    }
+
+    if (successCount > 0) {
+      setSuccess(`Successfully activated ${successCount} plugin(s)${failedPlugins.length > 0 ? `. Failed: ${failedPlugins.join(', ')}` : ''}`);
+    } else {
+      setError(`Failed to activate plugins: ${failedPlugins.join(', ')}`);
+    }
+
+    await fetchWebsiteDetails(false);
+    setSelectedPlugins([]);
+    setBulkActionLoading(false);
+  };
+
+  const handleBulkDeactivate = async () => {
+    const pluginsToDeactivate = websitePlugins.filter(p =>
+      selectedPlugins.includes(p.slug) && p.active && !isSparkleWPConnector(p)
+    );
+
+    if (pluginsToDeactivate.length === 0) {
+      setError('No active plugins selected (excluding SparkleWP Connector)');
+      return;
+    }
+
+    setBulkActionLoading(true);
+    setError('');
+    setSuccess('');
+
+    let successCount = 0;
+    let failedPlugins = [];
+
+    for (const plugin of pluginsToDeactivate) {
+      try {
+        console.log(`Bulk deactivating plugin: ${plugin.name} (${plugin.slug})`);
+        await api.post(`/api/websites/${id}/plugins/${plugin.slug}/deactivate`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        successCount++;
+      } catch (err) {
+        console.error(`Failed to deactivate ${plugin.name}:`, err);
+        failedPlugins.push(plugin.name);
+      }
+    }
+
+    if (successCount > 0) {
+      setSuccess(`Successfully deactivated ${successCount} plugin(s)${failedPlugins.length > 0 ? `. Failed: ${failedPlugins.join(', ')}` : ''}`);
+    } else {
+      setError(`Failed to deactivate plugins: ${failedPlugins.join(', ')}`);
+    }
+
+    await fetchWebsiteDetails(false);
+    setSelectedPlugins([]);
+    setBulkActionLoading(false);
   };
 
   if (loading) {
@@ -475,6 +622,57 @@ export default function WebsiteSettings() {
                   )}
                 </div>
 
+                {/* Bulk Actions Bar */}
+                {websitePlugins.length > 0 && (
+                  <div className="flex items-center justify-between p-4 rounded-xl border bg-gray-50 dark:bg-gray-800/20 border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center space-x-4">
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedPlugins.length === websitePlugins.length}
+                          onChange={handleSelectAllPlugins}
+                          className="w-5 h-5 rounded border-gray-300 text-gray-900 focus:ring-gray-500"
+                        />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Select All ({selectedPlugins.length} selected)
+                        </span>
+                      </label>
+                    </div>
+
+                    {selectedPlugins.length > 0 && (
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="filled"
+                          size="sm"
+                          onClick={handleBulkUpdate}
+                          disabled={bulkActionLoading || websitePlugins.filter(p => selectedPlugins.includes(p.slug) && p.update_available).length === 0}
+                          className="bg-gray-900 hover:bg-gray-800 text-white"
+                        >
+                          {bulkActionLoading ? 'Processing...' : 'Update Selected'}
+                        </Button>
+                        <Button
+                          variant="filled"
+                          size="sm"
+                          onClick={handleBulkActivate}
+                          disabled={bulkActionLoading}
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          Activate Selected
+                        </Button>
+                        <Button
+                          variant="filled"
+                          size="sm"
+                          onClick={handleBulkDeactivate}
+                          disabled={bulkActionLoading}
+                          className="bg-red-600 hover:bg-red-700 text-white"
+                        >
+                          Deactivate Selected
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {websitePlugins.length === 0 ? (
                   <div className="flex items-start space-x-3 p-6 rounded-xl border bg-gray-100 dark:bg-gray-800/20 border-gray-300 dark:border-gray-700">
                     <IconInfoCircle size={24} className="text-gray-600 dark:text-gray-400 mt-0.5 flex-shrink-0" />
@@ -490,7 +688,14 @@ export default function WebsiteSettings() {
                         className="border border-gray-200 dark:border-gray-700 rounded-2xl p-6 bg-white/80 dark:bg-gray-800/80 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-200"
                       >
                         <div className="flex justify-between items-start">
-                          <div className="flex-1 space-y-3">
+                          <div className="flex items-start space-x-4 flex-1">
+                            <input
+                              type="checkbox"
+                              checked={selectedPlugins.includes(plugin.slug)}
+                              onChange={() => handleSelectPlugin(plugin.slug)}
+                              className="w-5 h-5 mt-1 rounded border-gray-300 text-gray-900 focus:ring-gray-500"
+                            />
+                            <div className="flex-1 space-y-3">
                             <div className="flex items-center space-x-3 flex-wrap gap-2">
                               <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                                 {plugin.name}
@@ -517,10 +722,6 @@ export default function WebsiteSettings() {
                               )}
                             </div>
 
-                            <p className="text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2">
-                              {plugin.description || 'No description available.'}
-                            </p>
-
                             <div className="flex items-center space-x-6">
                               <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                                 Version: <span className="font-bold text-gray-900 dark:text-gray-100">{plugin.version}</span>
@@ -535,6 +736,7 @@ export default function WebsiteSettings() {
                                   Author: <span className="font-bold text-gray-900 dark:text-gray-100">{plugin.author}</span>
                                 </p>
                               )}
+                            </div>
                             </div>
                           </div>
 
@@ -553,12 +755,13 @@ export default function WebsiteSettings() {
                                 )}
                               </button>
                             )}
-                            <button
-                              title={plugin.active ? "Deactivate plugin" : "Activate plugin"}
-                              onClick={() => handlePluginToggle(plugin.slug, plugin.name, plugin.active)}
-                              disabled={actionLoading[`plugin-toggle-${plugin.slug}`]}
-                              className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
+                            {!isSparkleWPConnector(plugin) && (
+                              <button
+                                title={plugin.active ? "Deactivate plugin" : "Activate plugin"}
+                                onClick={() => handlePluginToggle(plugin.slug, plugin.name, plugin.active)}
+                                disabled={actionLoading[`plugin-toggle-${plugin.slug}`]}
+                                className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
                               {actionLoading[`plugin-toggle-${plugin.slug}`] ? (
                                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-600 border-t-transparent"></div>
                               ) : plugin.active ? (
@@ -566,7 +769,13 @@ export default function WebsiteSettings() {
                               ) : (
                                 <IconPlayerPlay size={20} />
                               )}
-                            </button>
+                              </button>
+                            )}
+                            {isSparkleWPConnector(plugin) && (
+                              <div className="w-11 h-11 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-900/30" title="SparkleWP Connector cannot be deactivated">
+                                <IconCheck size={20} className="text-green-600" />
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -630,10 +839,6 @@ export default function WebsiteSettings() {
                                 </Badge>
                               )}
                             </div>
-
-                            <p className="text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2">
-                              {theme.description || 'No description available.'}
-                            </p>
 
                             <div className="flex items-center space-x-6">
                               <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
