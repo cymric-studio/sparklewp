@@ -1155,8 +1155,10 @@ class SparkleWP_Connector {
         if (!function_exists('get_plugins')) {
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
         }
-        if (!function_exists('delete_plugins')) {
-            require_once ABSPATH . 'wp-admin/includes/file.php';
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        require_once ABSPATH . 'wp-admin/includes/misc.php';
+        if (!class_exists('WP_Upgrader')) {
+            require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
         }
 
         // Find the plugin file
@@ -1247,6 +1249,8 @@ class SparkleWP_Connector {
         }
 
         // Load required WordPress files
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        require_once ABSPATH . 'wp-admin/includes/misc.php';
         if (!function_exists('delete_theme')) {
             require_once ABSPATH . 'wp-admin/includes/theme.php';
         }
